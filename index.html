@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodpanda Redesign</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    </style>
+</head>
+
+<body>
+    <div class="window-frame">
+        <div class="app-container">
+            <header class="header">
+                <div class="header-left">
+                    <div class="header-logo" onclick="window.location.href='/'">
+                        <img src="assets/logos/foodpanda icon.png" alt="Foodpanda logo"
+                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
+                        <span>foodpanda</span>
+                    </div>
+                    <div class="main-nav-pill">
+                        <div class="nav-item active"><span class="icon">🛵</span> Delivery</div>
+                        <div class="nav-item"><span class="icon">🏃</span> Pick-up</div>
+                    </div>
+                </div>
+
+                <nav class="header-nav">
+                    <div class="nav-item"><span class="icon">🏨</span> Pandamart</div>
+                    <div class="nav-item"><span class="icon">🏪</span> Shops</div>
+                    <div class="nav-item"><span class="icon">🛍️</span> My Orders</div>
+                    <div class="nav-item"><span class="icon" style="color:#d70f64;">♡</span></div>
+                </nav>
+                <div class="header-auth">
+                    <div class="nav-item"><span class="icon">👤</span> Account</div>
+                    <div class="nav-item">Sign up</div>
+                </div>
+            </header>
+
+            <div class="search-bar-container">
+                <div class="location-pill">
+                    <span class="icon" style="color:#d70f64;">📍</span>
+                    <span class="text-muted">Find your current location...</span>
+                    <button class="change-btn">Change ></button>
+                </div>
+                <div class="search-input">
+                    <span class="icon text-muted">🔍</span>
+                    <input id="restaurantSearch" type="text" placeholder="Search for restaurants, cuisines, dishes..." aria-label="Search restaurants">
+                </div>
+            </div>
+
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Hungry? Let's get you fed!</h1>
+
+                    <div class="categories">
+                        <div class="category-card">
+                            <div class="cat-image-wrapper"><img src="images/cat_pizza.png" alt="Pizza"></div>
+                            <span>Pizza</span>
+                        </div>
+                        <div class="category-card">
+                            <div class="cat-image-wrapper"><img src="images/cat_chicken.png" alt="Chicken"></div>
+                            <span>Chicken</span>
+                        </div>
+                        <div class="category-card">
+                            <div class="cat-image-wrapper"><img src="images/cat_burger.png" alt="Burger"></div>
+                            <span>Burger</span>
+                        </div>
+                        <div class="category-card">
+                            <div class="cat-image-wrapper"><img src="images/cat_coffee.png" alt="Coffee"></div>
+                            <span>Coffee</span>
+                        </div>
+                    </div>
+
+                    <div class="filters-row">
+                        <button class="filter-btn white-btn filter-control" data-filter="Fast Food"><span class="icon">🍔</span> Fast Food</button>
+                        <button class="filter-btn white-btn filter-control" data-filter="rating4"><span style="color:#f5b041;">★</span>☆☆ Rating 4+</button>
+                        <button class="filter-btn white-btn">Price ⌄</button>
+                        <button class="filter-btn white-btn">More Filters ⌄</button>
+                    </div>
+                </div>
+
+                <div class="hero-image">
+                    <img src="assets/logos/food delivery hero.png" alt="Food delivery hero">
+                </div>
+                <div class="hero-image-buttons">
+                    <button class="filter-btn toggle-btn primary-tint filter-control" data-filter="free-delivery"><span class="icon">🚚</span> Free Delivery</button>
+                    <button class="filter-btn toggle-btn primary-gradient text-white filter-control" data-filter="top-offers"><span class="icon">🎟️</span> Top Offers</button>
+                </div>
+            </section>
+
+            <section class="restaurants-section">
+                <div class="restaurant-card" data-name="Mang Inasal - Iriga City" data-tags="Fast Food Chicken Free Delivery Top Offers" data-rating="4.9" tabindex="0" role="button" aria-label="Open Mang Inasal details" onclick="window.location.href='/checkout'">
+                    <div class="img-container">
+                        <img src="images/rest_mang_inasal.png" alt="Mang Inasal">
+                    </div>
+                    <div class="rest-info">
+                        <h3>Mang Inasal - Iriga City</h3>
+                        <div class="rating-row">
+                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
+                                class="muted">10000+</span>
+                        </div>
+                        <div class="bottom-row">
+                            <span class="tags">Fast Food</span>
+                            <span class="delivery-time">20 mins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-card" data-name="Jollibee - Iriga City" data-tags="Fast Food Burger Free Delivery" data-rating="4.9" tabindex="0" role="button" aria-label="Open Jollibee details" onclick="window.location.href='/checkout'">
+                    <div class="img-container">
+                        <img src="images/rest_jollibee.png" alt="Jollibee">
+                    </div>
+                    <div class="rest-info">
+                        <h3>Jollibee - Iriga City</h3>
+                        <div class="rating-row">
+                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
+                                class="muted">10000+</span>
+                        </div>
+                        <div class="bottom-row">
+                            <span class="tags">Fast Food</span>
+                            <span class="delivery-time">20 mins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-card" data-name="Mcdo - Iriga City" data-tags="Fast Food Burger Top Offers" data-rating="4.9" tabindex="0" role="button" aria-label="Open Mcdo details" onclick="window.location.href='/checkout'">
+                    <div class="img-container">
+                        <img src="images/rest_mcdo.png" alt="Mcdo">
+                    </div>
+                    <div class="rest-info">
+                        <h3>Mcdo - Iriga City</h3>
+                        <div class="rating-row">
+                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
+                                class="muted">10000+</span>
+                        </div>
+                        <div class="bottom-row">
+                            <span class="tags">Fast Food</span>
+                            <span class="delivery-time">20 mins</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <p id="emptyState" class="empty-state" hidden>No restaurants match your current search/filter. Try another keyword.</p>
+
+            <a href="#" class="chat-support">
+                <div class="support-img-wrapper">
+                    <img src="assets/logos/support.png" alt="Chat support panda">
+                </div>
+                <div class="chat-badge">24/7 Chat Support</div>
+            </a>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

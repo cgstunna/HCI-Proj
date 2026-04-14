@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodpanda Redesign - Tracking</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="window-frame">
+        <div class="app-container">
+            <header class="header">
+                <div class="header-logo" onclick="window.location.href='/'">
+                    <img src="images/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
+                    <span>foodpanda</span>
+                </div>
+                <div class="flex-grow"></div>
+                <div class="header-auth">
+                    <div class="nav-item"><span class="icon text-primary">👤</span> Ann ⌄</div>
+                    <div class="nav-item"><span class="icon text-primary">🌐</span> EN ⌄</div>
+                    <div class="nav-item"><span class="icon text-primary">♡</span></div>
+                    <div class="nav-item cart-icon"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
+                </div>
+            </header>
+
+            <h2 class="page-title main-heading">Track Your Order</h2>
+
+            <div class="tracking-stepper card-box pink-tint-bg">
+                 <div class="t-step active">
+                     <div class="check-circle">✔</div>
+                     <span>Order Placed</span>
+                 </div>
+                 <div class="t-line active"></div>
+                 <div class="t-step active">
+                     <div class="check-circle">✔</div>
+                     <span>Preparing Your Food</span>
+                 </div>
+                 <div class="t-line active"></div>
+                 <div class="t-step active">
+                     <div class="check-circle">✔</div>
+                     <span>Order Picked Up</span>
+                 </div>
+                 <div class="t-line active"></div>
+                 <div class="t-step active">
+                     <div class="check-circle">✔</div>
+                     <span>Arriving Soon</span>
+                 </div>
+                 <div class="t-line"></div>
+                 <div class="t-step">
+                     <div class="check-circle empty"></div>
+                     <span>Delivered</span>
+                 </div>
+            </div>
+
+            <div class="tracking-grid">
+                <div class="tracking-main">
+                    <div class="card-box shadow-sm">
+                        <h3 class="mb-3">Rider's Information</h3>
+                        <div class="rider-info-flex">
+                            <div class="rider-avatar" style="background-color: #ffcce0;"></div>
+                            <div class="details">
+                                <p><strong>Name:</strong> Tony Fowler</p>
+                                <p><strong>Vehicle:</strong> Honda Click</p>
+                                <p><strong>Mobile #:</strong> +63 9936782134</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-box shadow-sm mt-4">
+                        <div class="summary-header flex-between mb-3">
+                            <h3>Order Summary</h3>
+                            <button class="icon-btn circle-btn">⌄</button>
+                        </div>
+                        <div class="summary-preview flex-start gap-4">
+                            <div class="food-thumb-small" style="width: 80px; height: 60px;"></div>
+                            <div>
+                                <h4 class="m-0">Mang Inasal - Iriga City</h4>
+                                <p class="text-sm m-0 mt-1">1 pc. Pecho Large PM2</p>
+                                <p class="text-sm text-muted m-0 mt-1">Order #1234567890</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tracking-sidebar">
+                    <div class="card-box p-0 overflow-hidden shadow-sm pos-relative map-parent">
+                        <div class="arrival-header">
+                            <div class="clock-icon bg-primary text-white">🕒</div>
+                            <div>
+                                <h3 class="m-0">Estimated Arrival: 8:10 PM - 8:35 PM</h3>
+                                <p class="text-muted text-sm m-0 mt-1">Arriving in 20-25 mins</p>
+                            </div>
+                        </div>
+                        <div class="map-container" style="height: 250px; background-color: #fce4ec;">
+                            <div style="padding: 20px; text-align: center; color: var(--primary);">
+                                [Map Image Placeholder]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="#" class="chat-support">
+                <div class="support-img-wrapper">
+                    <img src="images/panda_support.png" alt="Chat support panda">
+                </div>
+                <div class="chat-badge">24/7 Chat Support</div>
+            </a>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

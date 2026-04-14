@@ -1,0 +1,17 @@
+{
+  "name": "hci-proj",
+  "version": "1.0.0",
+  "description": "This project is a front-end redesign prototype inspired by the Foodpanda ordering flow. It focuses on usability, accessibility, and smoother user interaction across discovery, checkout, and tracking.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
