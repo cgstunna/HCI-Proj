@@ -41,8 +41,8 @@
             <div class="search-bar-container">
                 <div class="location-pill">
                     <span class="icon" style="color:#d70f64;">📍</span>
-                    <span class="text-muted">Find your current location...</span>
-                    <button class="change-btn">Change ></button>
+                    <span id="locationDisplay" class="text-muted">Find your current location...</span>
+                    <button type="button" class="change-btn" id="locationChangeBtn" aria-haspopup="dialog" aria-controls="locationModal">Change &gt;</button>
                 </div>
                 <div class="search-input">
                     <span class="icon text-muted">🔍</span>
@@ -74,10 +74,35 @@
                     </div>
 
                     <div class="filters-row">
-                        <button class="filter-btn white-btn filter-control" data-filter="Fast Food"><span class="icon">🍔</span> Fast Food</button>
-                        <button class="filter-btn white-btn filter-control" data-filter="rating4"><span style="color:#f5b041;">★</span>☆☆ Rating 4+</button>
-                        <button class="filter-btn white-btn">Price ⌄</button>
-                        <button class="filter-btn white-btn">More Filters ⌄</button>
+                        <button type="button" class="filter-btn white-btn filter-control" data-filter="Fast Food"><span class="icon">🍔</span> Fast Food</button>
+                        <button type="button" class="filter-btn white-btn filter-control" data-filter="rating4" aria-pressed="false">
+                            <span class="filter-rating-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span><span>★</span><span class="is-dim">★</span></span>
+                            <span>Rating 4+</span>
+                        </button>
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger" id="filterPriceTrigger" aria-expanded="false" aria-haspopup="true" aria-controls="filterPricePanel">
+                                Price <span class="filter-chevron" aria-hidden="true"></span>
+                            </button>
+                            <div id="filterPricePanel" class="filter-dropdown__panel" role="menu" hidden>
+                                <button type="button" class="filter-dropdown__option" role="menuitem">Any price</button>
+                                <button type="button" class="filter-dropdown__option" role="menuitem">₱ Budget</button>
+                                <button type="button" class="filter-dropdown__option" role="menuitem">₱₱ Mid-range</button>
+                                <button type="button" class="filter-dropdown__option" role="menuitem">₱₱₱ Premium</button>
+                            </div>
+                        </div>
+                        <div class="filter-dropdown">
+                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger" id="filterMoreTrigger" aria-expanded="false" aria-haspopup="true" aria-controls="filterMorePanel">
+                                More Filters <span class="filter-chevron" aria-hidden="true"></span>
+                            </button>
+                            <div id="filterMorePanel" class="filter-dropdown__panel filter-dropdown__panel--wide" role="menu" hidden>
+                                <p class="filter-dropdown__hint">Quick options (demo)</p>
+                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-deals"> Deals &amp; offers</label>
+                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-new"> New on foodpanda</label>
+                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-halal"> Halal</label>
+                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-voucher"> Accepts vouchers</label>
+                                <button type="button" class="filter-dropdown__apply">Apply</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -85,8 +110,8 @@
                     <img src="assets/logos/food delivery hero.png" alt="Food delivery hero">
                 </div>
                 <div class="hero-image-buttons">
-                    <button class="filter-btn toggle-btn primary-tint filter-control" data-filter="free-delivery"><span class="icon">🚚</span> Free Delivery</button>
-                    <button class="filter-btn toggle-btn primary-gradient text-white filter-control" data-filter="top-offers"><span class="icon">🎟️</span> Top Offers</button>
+                    <button type="button" class="filter-btn toggle-btn primary-tint filter-control" data-filter="free-delivery"><span class="icon">🚚</span> Free Delivery</button>
+                    <button type="button" class="filter-btn toggle-btn primary-gradient text-white filter-control" data-filter="top-offers"><span class="icon">🎟️</span> Top Offers</button>
                 </div>
             </section>
 
@@ -145,12 +170,39 @@
 
             <p id="emptyState" class="empty-state" hidden>No restaurants match your current search/filter. Try another keyword.</p>
 
-            <a href="#" class="chat-support">
-                <div class="support-img-wrapper">
-                    <img src="assets/logos/support.png" alt="Chat support panda">
+        </div>
+
+        <a href="#" class="chat-support" aria-label="24/7 Chat Support">
+            <div class="support-img-wrapper">
+                <img src="assets/logos/support.png" alt="">
+            </div>
+            <div class="chat-badge">24/7 Chat Support</div>
+        </a>
+    </div>
+
+    <div id="locationModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="locationAddrLabel" hidden>
+        <div class="location-modal__panel">
+            <button type="button" class="location-modal__close" id="locationModalClose" aria-label="Close dialog">&times;</button>
+            <label id="locationAddrLabel" class="location-modal__label" for="locationAddressInput">Enter your address</label>
+            <div class="location-modal__row">
+                <div class="location-modal__field">
+                    <input id="locationAddressInput" type="text" class="location-modal__input" placeholder="Street, Postal Code" autocomplete="street-address">
+                    <button type="button" class="location-modal__locate" id="locationLocateMe">
+                        <svg class="location-modal__locate-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                        Locate me
+                    </button>
                 </div>
-                <div class="chat-badge">24/7 Chat Support</div>
-            </a>
+                <button type="button" class="location-modal__arrow" id="locationSubmitAddress" aria-label="Use this address">→</button>
+            </div>
+            <h3 class="location-modal__section-title">Popular locations</h3>
+            <div class="location-modal__pills">
+                <button type="button" class="location-modal__pill" data-location="Quezon City">Quezon City</button>
+                <button type="button" class="location-modal__pill" data-location="Manila">Manila</button>
+                <button type="button" class="location-modal__pill" data-location="Cebu City">Cebu City</button>
+                <button type="button" class="location-modal__pill" data-location="Calamba">Calamba</button>
+                <button type="button" class="location-modal__pill" data-location="San Pedro Laguna">San Pedro Laguna</button>
+            </div>
+            <a href="#" class="location-modal__login-link" id="locationLoginLink">Log in to save address</a>
         </div>
     </div>
     <script src="app.js"></script>

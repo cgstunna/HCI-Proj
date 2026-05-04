@@ -11,15 +11,15 @@
         <div class="app-container">
             <header class="header">
                 <div class="header-logo" onclick="window.location.href='/'">
-                    <img src="images/logo.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
+                    <img src="assets/logos/foodpanda icon.png" alt="Foodpanda logo"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
                     <span>foodpanda</span>
                 </div>
                 <div class="flex-grow"></div>
                 <div class="header-auth">
-                    <div class="nav-item"><span class="icon text-primary">👤</span> Ann ⌄</div>
-                    <div class="nav-item"><span class="icon text-primary">🌐</span> EN ⌄</div>
-                    <div class="nav-item"><span class="icon text-primary">♡</span></div>
-                    <div class="nav-item cart-icon"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
+                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Carl Gerald" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Carl Gerald <span class="header-menu-chev" aria-hidden="true"></span></div>
+                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> ENG </div>
+                    <div class="nav-item cart-icon header-menu-trigger" data-header-menu="cart" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
                 </div>
             </header>
 
@@ -59,9 +59,9 @@
                         <div class="rider-info-flex">
                             <div class="rider-avatar" style="background-color: #ffcce0;"></div>
                             <div class="details">
-                                <p><strong>Name:</strong> Tony Fowler</p>
-                                <p><strong>Vehicle:</strong> Honda Click</p>
-                                <p><strong>Mobile #:</strong> +63 9936782134</p>
+                                <p><strong>Name:</strong> Kenji David</p>
+                                <p><strong>Vehicle:</strong> Honda Click v3 125</p>
+                                <p><strong>Mobile #:</strong> 639222555100</p>
                             </div>
                         </div>
                     </div>
@@ -69,9 +69,11 @@
                     <div class="card-box shadow-sm mt-4">
                         <div class="summary-header flex-between mb-3">
                             <h3>Order Summary</h3>
-                            <button class="icon-btn circle-btn">⌄</button>
+                            <button type="button" class="order-summary-toggle" id="orderSummaryToggle" aria-expanded="true" aria-controls="orderSummaryBody" aria-label="Show or hide order details">
+                                <span class="order-summary-toggle__chev" aria-hidden="true"></span>
+                            </button>
                         </div>
-                        <div class="summary-preview flex-start gap-4">
+                        <div id="orderSummaryBody" class="summary-preview flex-start gap-4">
                             <div class="food-thumb-small" style="width: 80px; height: 60px;"></div>
                             <div>
                                 <h4 class="m-0">Mang Inasal - Iriga City</h4>
@@ -100,13 +102,14 @@
                 </div>
             </div>
 
-            <a href="#" class="chat-support">
-                <div class="support-img-wrapper">
-                    <img src="images/panda_support.png" alt="Chat support panda">
-                </div>
-                <div class="chat-badge">24/7 Chat Support</div>
-            </a>
         </div>
+
+        <a href="#" class="chat-support" aria-label="24/7 Chat Support">
+            <div class="support-img-wrapper">
+                <img src="assets/logos/support.png" alt="">
+            </div>
+            <div class="chat-badge">24/7 Chat Support</div>
+        </a>
     </div>
     <script src="app.js"></script>
 </body>

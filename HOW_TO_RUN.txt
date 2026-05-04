@@ -1,0 +1,20 @@
+HCI UI/UX Project - How to Run
+
+1. Install Node.js (v18+ recommended).
+2. Open a terminal in this project folder.
+3. Run: npm install
+4. Run: npm start
+5. Open your browser and go to: http://localhost:3000
+
+Page Flow
+- Home page: /
+- Checkout page: /checkout
+- Tracking page: /tracking
+
+Core Interaction Notes
+- Restaurant cards on the home page redirect to Checkout.
+- "Place Order" redirects from Checkout to Tracking.
+- Header logo redirects to Home.
+- "My Orders" redirects to Tracking.
+- Search and filter controls on Home update restaurant results.
+- Prototype-only actions (Change location, Edit links, Chat support) show feedback messages.
