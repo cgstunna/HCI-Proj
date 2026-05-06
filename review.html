@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodpanda Redesign - Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="window-frame">
+        <div class="app-container">
+            <header class="header">
+                <div class="header-logo" onclick="window.location.href='/'">
+                    <img src="assets/logos/pandabites.png" alt="Foodpanda logo"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
+                    <span>foodpanda</span>
+                </div>
+                <button type="button" id="checkoutHeaderLocation" class="location-pill center-pill checkout-location-btn" aria-label="Delivery area: Iriga City, Camarines Sur. Change location">
+                    <span class="icon text-primary">📍</span>
+                    <span class="checkout-location-text">Iriga City, Camarines Sur</span>
+                    <span class="header-menu-chev" aria-hidden="true"></span>
+                </button>
+                <div class="header-auth">
+                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Carl Gerald" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Carl Gerald <span class="header-menu-chev" aria-hidden="true"></span></div>
+                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> ENG</div>
+                    <div class="nav-item cart-icon header-menu-trigger" data-header-menu="cart" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
+                </div>
+            </header>
+
+            <div class="checkout-header">
+                <h2>Review and place your order</h2>
+                <div class="stepper">
+                    <div class="step active"><div class="circle">1</div> Delivery Details</div>
+                    <div class="line"></div>
+                    <div class="step"><div class="circle">2</div> Payment</div>
+                    <div class="line"></div>
+                    <div class="step"><div class="circle">3</div> Review</div>
+                </div>
+            </div>
+
+            <div class="checkout-grid">
+                <div class="checkout-main">
+                    <div class="card-box">
+                        <h3>Delivery Details</h3>
+                        <div class="section-title">Delivery Address <a href="#" class="edit-text" id="deliveryAddressChange">Change</a></div>
+                        <div class="address-card">
+                            <div class="map-thumb" style="background-color: #f0f0f0; width: 120px; height: 80px; border-radius: 8px;"></div>
+                            <div class="address-info">
+                                <h4><span class="icon text-primary">📍</span> Camarines Sur Polytechnic Colleges</h4>
+                                <p class="text-muted">4434, National Rd, Nabua, Camarines Sur</p>
+                                <input type="text" placeholder="Note to rider e.g building, landmark" class="note-input">
+                            </div>
+                            <a href="#" class="edit-link" id="deliveryAddressEdit">Edit</a>
+                        </div>
+                        <div class="toggle-row">
+                            <span class="text-sm">Contactless Delivery</span>
+                            <div class="toggle-switch active"><div class="knob"></div></div>
+                        </div>
+                        <div class="section-title mt-4">Delivery Options</div>
+                        <div class="options-grid">
+                            <div class="option-btn active"><div class="radio selected"></div> Standard (5-20 minutes)</div>
+                            <div class="option-btn bg-pink-light"><div class="radio"></div> Priority (5-15 minutes)</div>
+                            <div class="option-btn bg-pink-light"><div class="radio"></div> Scheduled <span class="icon text-primary ml-auto">📅</span></div>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <h3>Personal Details</h3>
+                        <div class="personal-card">
+                            <div class="info">
+                                <h4 id="checkoutDisplayName">Carl Gerald Parro</h4>
+                                <p id="checkoutDisplayEmail" class="text-muted">carlgeraldparro@gmail.com</p>
+                                <p id="checkoutDisplayPhone" class="text-muted">09625728203</p>
+                            </div>
+                            <a href="#" class="edit-link" id="personalDetailsOpen">Edit</a>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <h3>Payment</h3>
+                        <div class="payment-grid">
+                            <div class="option-btn bg-pink-light"><div class="radio"></div> Cash on Delivery</div>
+                            <div class="option-btn bg-pink-light"><div class="radio"></div> Link Bank Account <div class="bank-icons">🏦</div></div>
+                            <div class="option-btn active"><div class="radio selected"></div> e-wallet <span class="ewallet-icon" aria-hidden="true">📱</span></div>
+                            <div class="option-btn bg-pink-light"><div class="radio"></div> Credit or Debit Card <span class="cards-icon">💳</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-sidebar">
+                    <div class="card-box order-summary">
+                        <h3>Your Order</h3>
+                        <div class="restaurant-title">
+                            <div class="rest-logo-small"></div>
+                            <span><strong>Mang Inasal</strong> - Iriga City</span>
+                        </div>
+                        <div class="order-items">
+                            <div class="item">
+                                <div class="item-qty">3 ✕</div>
+                                <div class="item-desc">
+                                    <strong>Pecho Large - PM2</strong>
+                                    <div class="food-thumb-small"></div>
+                                </div>
+                                <div class="item-price">₱ 561</div>
+                            </div>
+                            <hr class="divider">
+                            <div class="item">
+                                <div class="item-qty">1 ✕</div>
+                                <div class="item-desc">
+                                    <strong>Paa Large - PM1</strong>
+                                    <div class="food-thumb-small"></div>
+                                </div>
+                                <div class="item-price">₱ 157</div>
+                            </div>
+                        </div>
+                        <a href="#" class="add-more">+ Add more items</a>
+                        <div class="totals pt-4 mt-4">
+                            <div class="row text-sm"><span class="text-muted">Subtotal</span><span class="text-muted">₱718</span></div>
+                            <div class="row text-sm"><span class="text-muted">Standard delivery Free</span><span class="text-muted">Free</span></div>
+                            <div class="row text-sm"><span class="text-muted">Service Fee</span><span class="text-muted">₱5</span></div>
+                            <div class="row total-row mt-2"><strong>Total</strong> <small class="text-muted font-normal">(incl. fees and tax)</small> <strong>₱ 723</strong></div>
+                        </div>
+                        <button class="primary-btn checkout-btn full-width mt-4" onclick="window.location.href='/tracking'">Place Order ₱ 723</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="personalDetailsModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="personalDetailsTitle" hidden>
+            <div class="location-modal__panel">
+                <button type="button" class="location-modal__close" id="personalDetailsModalClose" aria-label="Close">&times;</button>
+                <h2 id="personalDetailsTitle" class="main-heading" style="font-size: 22px; margin-bottom: 16px;">Edit personal details</h2>
+                <label class="location-modal__label" for="pdFullName">Full name</label>
+                <input id="pdFullName" type="text" class="note-input" style="width: 100%; margin-bottom: 14px;" autocomplete="name">
+                <label class="location-modal__label" for="pdEmail">Email</label>
+                <input id="pdEmail" type="email" class="note-input" style="width: 100%; margin-bottom: 14px;" autocomplete="email">
+                <label class="location-modal__label" for="pdPhone">Mobile number</label>
+                <input id="pdPhone" type="tel" class="note-input" style="width: 100%; margin-bottom: 20px;" autocomplete="tel">
+                <button type="button" class="primary-btn full-width" id="personalDetailsSave">Save changes</button>
+            </div>
+        </div>
+
+        <a href="#" class="chat-support" aria-label="24/7 Chat Support">
+            <div class="support-img-wrapper">
+                <img src="assets/logos/support.png" alt="">
+            </div>
+            <div class="chat-badge">24/7 Chat Support</div>
+        </a>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
