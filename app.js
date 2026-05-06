@@ -739,6 +739,10 @@ document.addEventListener('DOMContentLoaded', () => {
         openConfirmPaymentModal();
     });
 
+    document.getElementById('reviewBtn')?.addEventListener('click', () => {
+        window.location.href = 'review.html';
+    });
+
     document.getElementById('confirmPaymentClose')?.addEventListener('click', closeConfirmPaymentModal);
     document.getElementById('confirmPaymentCancel')?.addEventListener('click', closeConfirmPaymentModal);
     confirmPaymentModal?.addEventListener('click', e => {
