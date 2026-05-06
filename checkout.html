@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Menu</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -18,13 +20,13 @@
 
             <div class="menu-location-pill" id="locationBtn">
                 <span>📍</span>
-                <span>Iriga City, Camarines Sur</span>
-                <span>⌄</span>
+                <span id="locationDisplay">Iriga City, Camarines Sur</span>
+                <span class="menu-caret" aria-hidden="true">▾</span>
             </div>
 
             <div class="menu-icons">
-                <span id="accountBtn">👤 Ann⌄</span>
-                <span id="languageBtn">🌐 EN⌄</span>
+                <span id="accountBtn">👤 Account <span class="menu-caret" aria-hidden="true">▾</span></span>
+                <span id="languageBtn">🌐 EN <span class="menu-caret" aria-hidden="true">▾</span></span>
                 <span id="favoriteBtn">♡</span>
                 <span id="cartIcon">🛒</span>
                 <span>🐼</span>
@@ -92,6 +94,34 @@
     </div>
 </div>
 
+<div id="locationModal" class="location-modal" hidden>
+    <div class="location-map-panel">
+        <button type="button" class="location-map-close" id="locationModalClose">x</button>
+
+        <h2>Set Your Delivery Location</h2>
+
+        <div class="location-map-input">
+            <span>⌕</span>
+            <input id="locationAddressInput" type="text" placeholder="Enter your delivery address">
+        </div>
+
+        <div class="location-map-selected">
+            <span>📍</span>
+            <p id="selectedLocationText">Click the map to pin your location</p>
+        </div>
+
+        <div id="liveMap" class="location-map-box"></div>
+
+        <div class="location-map-caption" id="locationCaption">
+            No location selected yet
+        </div>
+
+        <button type="button" class="location-map-confirm" id="locationSubmitAddress">
+            Confirm
+        </button>
+    </div>
+</div>
+
 <!-- FOOD MODAL -->
 <div id="foodModal" class="food-modal" hidden>
     <div class="food-modal-card">
@@ -106,55 +136,32 @@
 
             <hr>
 
-            <div class="option-box">
-                <div class="option-title">
+            <div id="modalChoiceGroups"></div>
+
+            <div class="addons-box" id="fbtBox">
+                <div class="option-title option-title--plain">
                     <div>
-                        <h3>Variation</h3>
-                        <p>Select 1</p>
+                        <h3>Frequently bought together</h3>
+                        <p>Other customers also ordered these</p>
                     </div>
-                    <span>Required</span>
+                    <span class="optional-badge">Optional</span>
                 </div>
-
-                <label class="option-row">
-                    <input type="radio" name="variation" value="Solo" data-price="0" checked>
-                    <span>Solo</span>
-                    <strong id="soloPrice">₱0</strong>
-                </label>
-
-                <label class="option-row">
-                    <input type="radio" name="variation" value="With Drink" data-price="30">
-                    <span>With Drink</span>
-                    <strong id="drinkPrice">₱0</strong>
-                </label>
-
-                <label class="option-row">
-                    <input type="radio" name="variation" value="Busog Upgrade" data-price="49">
-                    <span>Busog Upgrade <small>1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi</small></span>
-                    <strong id="upgradePrice">₱0</strong>
-                </label>
+                <div id="modalAddonList"></div>
             </div>
 
             <div class="addons-box">
-                <h3>Frequently bought together</h3>
-                <p>Other consumers also ordered these</p>
+                <h3>Special instructions</h3>
+                <p>Special requests are subject to the restaurant's approval. Tell us here!</p>
+                <textarea id="modalSpecialInstructions" class="modal-special-input" rows="3" placeholder="e.g. No mayo"></textarea>
+            </div>
 
-                <label class="addon-row">
-                    <span>🌄 Chicken Oil</span>
-                    <strong>+ ₱7</strong>
-                    <input type="checkbox" data-price="7">
-                </label>
-
-                <label class="addon-row">
-                    <span>🌄 Soup</span>
-                    <strong>+ ₱12</strong>
-                    <input type="checkbox" data-price="12">
-                </label>
-
-                <label class="addon-row">
-                    <span>🌄 Toyomansi</span>
-                    <strong>+ ₱7</strong>
-                    <input type="checkbox" data-price="7">
-                </label>
+            <div class="addons-box">
+                <h3>If this product is not available</h3>
+                <select id="modalUnavailableAction" class="modal-unavailable-select">
+                    <option value="remove">Remove it from my order</option>
+                    <option value="contact">Call me to decide</option>
+                    <option value="replace">Replace with a similar item</option>
+                </select>
             </div>
 
             <div class="modal-bottom">
@@ -178,34 +185,34 @@ const restaurantData = {
         logo: "assets/manglogo.svg",
         hero: "assets/food/pm2.webp",
         items: [
-            { name: "Paa Large - PM1", price: 157, img: "images/paa-large.png", category: "Popular" },
-            { name: "Pecho Large - PM2", price: 187, img: "images/pecho-large.png", category: "Chicken" },
-            { name: "Pork BBQ Meal", price: 145, img: "images/paa-large.png", category: "Meals" },
-            { name: "Halo-Halo", price: 89, img: "images/pecho-large.png", category: "Dessert" }
+            { name: "Paa Large - PM1", price: 161, img: "assets/food/Paa Large - PM1.webp", category: "Popular", desc: "Paa Large with 1 rice" },
+            { name: "Pecho Large - PM2", price: 191, img: "assets/food/Pecho Large - PM2.webp", category: "Chicken", desc: "Pecho Large with 1 rice" },
+            { name: "Pork BBQ Meal", price: 145, img: "assets/food/Pork BBQ Meal.webp", category: "Meals", desc: "Pork BBQ meal with rice" },
+            { name: "Halo-Halo", price: 89, img: "assets/food/Halo - Halo.webp", category: "Dessert", desc: "Classic halo-halo dessert" }
         ]
     },
     "jollibee": {
         name: "Jollibee - Iriga City",
         category: "Fast Food · Chicken · Burger · Spaghetti",
-        logo: "images/jollibee-logo.png",
-        hero: "images/jollibee-food.png",
+        logo: "assets/food/Jollibee logo.jpg",
+        hero: "assets/food/Jollibee side photo food.png",
         items: [
-            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "images/chickenjoy.png", category: "Popular" },
-            { name: "Jolly Spaghetti", price: 75, img: "images/spaghetti.png", category: "Meals" },
-            { name: "Yumburger", price: 55, img: "images/chickenjoy.png", category: "Burger" },
-            { name: "Peach Mango Pie", price: 48, img: "images/spaghetti.png", category: "Dessert" }
+            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "assets/food/1-pc. Chickenjoy w Drink.webp", category: "Popular", desc: "Philippines' best-tasting crispylicious, juicylicious Chickenjoy that is crispy on the outside, tender and juicy on the inside." },
+            { name: "Jolly Spaghetti", price: 78, img: "assets/food/Jolly Spaghetti.webp", category: "Meals", desc: "Jolly Spaghetti Solo" },
+            { name: "Yumburger", price: 55, img: "assets/food/Yumburger.webp", category: "Burger", desc: "Yumburger meal" },
+            { name: "Peach Mango Pie", price: 53, img: "assets/food/Peach Mango Pie.webp", category: "Dessert", desc: "Golden brown, flaky, slightly sweet crust with a pleasant blend of diced peaches and mango filling in thick sauce" }
         ]
     },
     "mcdo": {
         name: "Mcdo - Iriga City",
         category: "Fast Food · Burgers · Fries · Drinks",
-        logo: "images/mcdo-logo.png",
-        hero: "images/mcdo-food.png",
+        logo: "assets/food/McDonalds logo.jpg",
+        hero: "assets/food/McDonald side photo food.png",
         items: [
-            { name: "Burger McDo Meal", price: 115, img: "assets/food/chicken1.webp", category: "Popular" },
-            { name: "McChicken Meal", price: 155, img: "images/mcchicken.png", category: "Chicken" },
-            { name: "Fries Large", price: 92, img: "images/burger-mcdo.png", category: "Meals" },
-            { name: "Coke Float", price: 65, img: "images/mcchicken.png", category: "Drinks" }
+            { name: "Burger McDo w/ Fries Small Meal", price: 126, img: "assets/food/Burger McDo w Fries Small Meal.webp", category: "Popular", desc: "Comes with Small Fries & Drink" },
+            { name: "1-pc. Chicken McDo Medium Meal", price: 116, img: "assets/food/1-pc. Chicken McDo Medium Meal.webp", category: "Chicken", desc: "Comes with a Drink" },
+            { name: "McShaker Fries Large Cheese", price: 124, img: "assets/food/McShaker Fries Large Cheese.webp", category: "Meals", desc: "" },
+            { name: "Coke McFloat Large", price: 80, img: "assets/food/Coke McFloat Large.webp", category: "Drinks", desc: "Drink only" }
         ]
     }
 };
@@ -218,6 +225,10 @@ let cart = [];
 let currentCategory = "Popular";
 let selectedFood = null;
 let modalQty = 1;
+let locationMap;
+let locationMarker;
+let pinnedLat = null;
+let pinnedLng = null;
 
 const restaurantName = document.getElementById("restaurantName");
 const restaurantCategory = document.getElementById("restaurantCategory");
@@ -259,11 +270,15 @@ function renderMenu() {
         const card = document.createElement("div");
         card.className = "menu-food-card";
 
+        const itemDescription = Object.prototype.hasOwnProperty.call(item, "desc")
+            ? item.desc
+            : `${item.name} meal`;
+
         card.innerHTML = `
             <div>
                 <h3>${item.name}</h3>
                 <strong>from ₱${item.price}</strong>
-                <p>${item.name} meal</p>
+                <p>${itemDescription}</p>
             </div>
             <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
             <button type="button">+</button>
@@ -286,19 +301,426 @@ function openFoodModal(item) {
 
     document.getElementById("modalFoodName").textContent = item.name;
     document.getElementById("modalFoodPrice").textContent = "₱" + item.price;
-    document.getElementById("modalFoodDesc").textContent = item.name + " meal";
+    const modalDescription = Object.prototype.hasOwnProperty.call(item, "desc")
+        ? item.desc
+        : (item.name + " meal");
+    document.getElementById("modalFoodDesc").textContent = modalDescription;
     document.getElementById("modalFoodImg").src = item.img;
-    
 
-    document.getElementById("soloPrice").textContent = "₱" + item.price;
-    document.getElementById("drinkPrice").textContent = "₱" + (item.price + 30);
-    document.getElementById("upgradePrice").textContent = "₱" + (item.price + 49);
-
-    document.querySelector("input[name='variation'][value='Solo']").checked = true;
-    document.querySelectorAll(".addon-row input").forEach(input => input.checked = false);
+    renderModalSelections(item);
+    document.getElementById("modalSpecialInstructions").value = "";
+    document.getElementById("modalUnavailableAction").value = "remove";
     document.getElementById("modalQty").textContent = modalQty;
 
     document.getElementById("foodModal").hidden = false;
+}
+
+function getModalConfig(item) {
+    const defaults = {
+        choiceGroups: [
+            {
+                heading: "Choice A",
+                subtext: "Select up to 10 (optional)",
+                badges: ["Optional"],
+                inputType: "checkbox",
+                options: [
+                    { name: "Plain Rice", add: 30 },
+                    { name: "Java Rice", add: 42 },
+                    { name: "Soup", add: 12 }
+                ]
+            }
+        ],
+        frequentlyBoughtTogether: [
+            { name: "Soup", add: 12 },
+            { name: "Plain Rice", add: 30 }
+        ]
+    };
+
+    const configs = {
+        "Paa Large - PM1": {
+            choiceGroups: [
+                {
+                    heading: "Variation",
+                    subtext: "Select 1",
+                    badges: ["Required", "Completed"],
+                    inputType: "radio",
+                    maxSelect: 1,
+                    options: [
+                        { name: "Solo", add: 0 },
+                        { name: "With Drink", add: 30 },
+                        { name: "BuSOLB Upgrade", add: 45, note: "1 Small Drink, 1 Plain Rice, and 1 Extra Chicken Oil & Toyomansi" }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Chicken Oil", subtitle: "Chicken Oil", add: 7 },
+                { name: "Soup", subtitle: "Soup", add: 12 },
+                { name: "Toyomansi", subtitle: "Toyomansi", add: 7 },
+                { name: "Plain Rice", subtitle: "Plain Rice", add: 30 },
+                { name: "2 pcs Lumpiang Togue", subtitle: "2 pcs Lumpiang Togue", add: 65 },
+                { name: "Extra Creamy Halo-Halo Small", subtitle: "Extra Creamy Halo-Halo Small", add: 82 },
+                { name: "Extra Creamy Halo-Halo Regular", subtitle: "Extra Creamy Halo-Halo Regular", add: 113 },
+                { name: "Spiced Vinegar", add: 8 },
+                { name: "Java Rice", subtitle: "Java Rice", add: 42 },
+                { name: "2pcs Spicy Pork BBQ with Peanut Sauce & Java Rice", add: 173 }
+            ]
+        },
+        "Pecho Large - PM2": {
+            choiceGroups: [
+                {
+                    heading: "Choice A",
+                    subtext: "Select up to 10 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 10,
+                    options: [
+                        { name: "Plain Rice", add: 30 },
+                        { name: "Java Rice", add: 42 },
+                        { name: "Soup", add: 12 },
+                        { name: "Spiced Vinegar", add: 8 },
+                        { name: "Peanut Sauce", add: 8 }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Soup", add: 12 },
+                { name: "Plain Rice", add: 30 },
+                { name: "Palabok Regular Size", add: 101 },
+                { name: "Iced Red Gulaman Medium", add: 58 },
+                { name: "Coke Medium", add: 58 },
+                { name: "Java Rice", add: 42 },
+                { name: "Coke Small", add: 46 },
+                { name: "Coke Zero Small", add: 46 },
+                { name: "Pecho Large - PM2 (with Coke)", add: 221 },
+                { name: "Iced Tea Small", add: 46 }
+            ]
+        },
+        "Pork BBQ Meal": {
+            choiceGroups: [],
+            frequentlyBoughtTogether: [
+                { name: "Soup", subtitle: "Soup", add: 12 },
+                { name: "Chicken Oil", subtitle: "Chicken Oil", add: 7 },
+                { name: "2 pcs Lumpiang Togue", subtitle: "2 pcs Lumpiang Togue", add: 65 },
+                { name: "Extra Creamy Halo-Halo Small", subtitle: "Extra Creamy Halo-Halo Small", add: 82 },
+                { name: "Plain Rice", subtitle: "Plain Rice", add: 30 },
+                { name: "Toyomansi", subtitle: "Toyomansi", add: 7 },
+                { name: "Peanut Sauce", subtitle: "Peanut Sauce", add: 8 },
+                { name: "Spiced Vinegar", add: 8 },
+                { name: "Extra Creamy Halo-Halo Regular", subtitle: "Extra Creamy Halo-Halo Regular", add: 113 },
+                { name: "1pc Spicy Pork BBQ Ala Carte", add: 65 }
+            ]
+        },
+        "Halo-Halo": {
+            choiceGroups: [],
+            frequentlyBoughtTogether: []
+        },
+        "1-pc. Chickenjoy w/ Drink": {
+            choiceGroups: [
+                {
+                    heading: "Choice A",
+                    subtext: "Select 1",
+                    badges: ["Required", "Completed"],
+                    inputType: "radio",
+                    maxSelect: 1,
+                    options: [
+                        { name: "Coke Regular", add: 0, priceText: "Free" },
+                        { name: "Go Medium Coke", add: 30 },
+                        { name: "Go Large Coke", add: 36 },
+                        { name: "Coke Zero Regular", add: 0, priceText: "Free" },
+                        { name: "Go Medium Coke Zero", add: 30 }
+                    ]
+                },
+                {
+                    heading: "Choice B",
+                    subtext: "Select up to 2 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 2,
+                    options: [
+                        { name: "Extra Chickenjoy Gravy", add: 12 },
+                        { name: "Extra Rice", add: 48 }
+                    ]
+                },
+                {
+                    heading: "Choice C",
+                    subtext: "Select up to 3 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 3,
+                    options: [
+                        { name: "Medium Jolly Crispy Fries", add: 105 }
+                    ]
+                },
+                {
+                    heading: "Choice D",
+                    subtext: "Select up to 6 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 6,
+                    options: [
+                        { name: "Peach Mango Pie", add: 53 },
+                        { name: "Large Peach Mango Pie", add: 82 },
+                        { name: "Chocolate Sundae", add: 62 },
+                        { name: "Cookies & Cream Sundae", add: 82 },
+                        { name: "Strawberry Burst Choco Sundae", add: 73 }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Yumburger Solo", subtitle: "Yumburger Solo", add: 51 },
+                { name: "Jolly Spaghetti Solo", subtitle: "Jolly Spaghetti Solo", add: 78 },
+                { name: "Chocolate Sundae", subtitle: "Chocolate Sundae", add: 62 },
+                { name: "Extra Chickenjoy Gravy", subtitle: "Extra Chickenjoy Gravy", add: 12 },
+                { name: "1 - pc. Burger Steak Solo", subtitle: "1 - pc. Burger Steak Solo", add: 82 },
+                { name: "1 - pc. Chickenjoy Solo", subtitle: "1 - pc. Chickenjoy Solo", add: 103 },
+                { name: "Peach Mango Pie", subtitle: "Peach Mango Pie", add: 53 },
+                { name: "Extra Rice", subtitle: "Extra Rice", add: 48 },
+                { name: "Mini Chocolate Sundae", subtitle: "Mini Chocolate Sundae", add: 36 },
+                { name: "Coke Float", subtitle: "Coke Float", add: 80 }
+            ]
+        },
+        "Jolly Spaghetti": {
+            choiceGroups: [
+                {
+                    heading: "Choice A",
+                    subtext: "Select up to 3 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 3,
+                    options: [{ name: "Medium Jolly Crispy Fries", add: 105 }]
+                },
+                {
+                    heading: "Choice B",
+                    subtext: "Select up to 6 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 6,
+                    options: [
+                        { name: "Peach Mango Pie", add: 53 },
+                        { name: "Large Peach Mango Pie", add: 82 },
+                        { name: "Chocolate Sundae", add: 62 },
+                        { name: "Cookies & Cream Sundae", add: 82 },
+                        { name: "Strawberry Burst Choco Sundae", add: 73 }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Yumburger Solo", subtitle: "Yumburger Solo", add: 51 },
+                { name: "1 - pc. Chickenjoy Solo", subtitle: "1 - pc. Chickenjoy Solo", add: 103 },
+                { name: "Chocolate Sundae", subtitle: "Chocolate Sundae", add: 62 },
+                { name: "Peach Mango Pie", subtitle: "Peach Mango Pie", add: 53 },
+                { name: "Coke Float", subtitle: "Coke Float", add: 80 },
+                { name: "Cheesy Classic Jolly Hotdog Solo", subtitle: "Cheesy Classic Jolly Hotdog Solo", add: 94 },
+                { name: "1 - pc. Burger Steak Solo", subtitle: "1 - pc. Burger Steak Solo", add: 82 },
+                { name: "Original Cheesy Yumburger Solo", subtitle: "Original Cheesy Yumburger Solo", add: 82 },
+                { name: "Extra Chickenjoy Gravy", subtitle: "Extra Chickenjoy Gravy", add: 12 },
+                { name: "Mini Chocolate Sundae", subtitle: "Mini Chocolate Sundae", add: 36 }
+            ]
+        },
+        "Yumburger": {
+            choiceGroups: [
+                {
+                    heading: "Choice A",
+                    subtext: "Select up to 4 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 4,
+                    options: [
+                        { name: "Extra Patty", add: 50 },
+                        { name: "Extra Cheese", add: 42 },
+                        { name: "Extra Bacon", add: 48 },
+                        { name: "Extra Lettuce & Tomato", add: 24 }
+                    ]
+                },
+                {
+                    heading: "Choice B",
+                    subtext: "Select up to 3 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 3,
+                    options: [{ name: "Medium Jolly Crispy Fries", add: 105 }]
+                },
+                {
+                    heading: "Choice C",
+                    subtext: "Select up to 6 (optional)",
+                    badges: ["Optional"],
+                    inputType: "checkbox",
+                    maxSelect: 6,
+                    options: [
+                        { name: "Peach Mango Pie", add: 53 },
+                        { name: "Large Peach Mango Pie", add: 82 },
+                        { name: "Chocolate Sundae", add: 62 },
+                        { name: "Cookies & Cream Sundae", add: 82 },
+                        { name: "Strawberry Burst Choco Sundae", add: 73 }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Jolly Spaghetti Solo", subtitle: "Jolly Spaghetti Solo", add: 78 },
+                { name: "1 - pc. Chickenjoy Solo", subtitle: "1 - pc. Chickenjoy Solo", add: 103 },
+                { name: "Chocolate Sundae", subtitle: "Chocolate Sundae", add: 62 },
+                { name: "Peach Mango Pie", subtitle: "Peach Mango Pie", add: 53 },
+                { name: "Coke Float", subtitle: "Coke Float", add: 80 },
+                { name: "1 - pc. Burger Steak Solo", subtitle: "1 - pc. Burger Steak Solo", add: 82 },
+                { name: "Extra Chickenjoy Gravy", subtitle: "Extra Chickenjoy Gravy", add: 12 },
+                { name: "Cheesy Classic Jolly Hotdog Solo", subtitle: "Cheesy Classic Jolly Hotdog Solo", add: 94 },
+                { name: "Iced Mocha Regular", subtitle: "Iced Mocha Regular", add: 83 },
+                { name: "Extra Rice", subtitle: "Extra Rice", add: 48 }
+            ]
+        },
+        "Peach Mango Pie": {
+            choiceGroups: [],
+            frequentlyBoughtTogether: []
+        },
+        "Burger McDo w/ Fries Small Meal": {
+            choiceGroups: [
+                {
+                    heading: "Choose your Fries",
+                    subtext: "Select 1",
+                    badges: ["Required", "Completed"],
+                    inputType: "radio",
+                    maxSelect: 1,
+                    options: [
+                        { name: "Regular Fries", add: 0, priceText: "Free" },
+                        { name: "Medium Fries", add: 27 },
+                        { name: "Large Fries", add: 57 },
+                        { name: "Twister Fries Regular", add: 29 },
+                        { name: "McShaker Fries Medium Cheese", add: 28 },
+                        { name: "McShaker Fries Medium BBQ", add: 28 }
+                    ]
+                },
+                {
+                    heading: "Choose your Drink",
+                    subtext: "Select 1",
+                    badges: ["Required", "Completed"],
+                    inputType: "radio",
+                    maxSelect: 1,
+                    options: [
+                        { name: "Coke Small", add: 0, priceText: "Free" },
+                        { name: "Coke Medium", add: 11 },
+                        { name: "Coke Large", add: 20 },
+                        { name: "Coke Zero Small", add: 0, priceText: "Free" },
+                        { name: "Coke Zero Medium", add: 11 }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Burger McDo Solo", subtitle: "Burger McDo Solo", add: 52 },
+                { name: "Hot Fudge Sundae", subtitle: "Hot Fudge Sundae", add: 59 },
+                { name: "Crispy Chicken Sandwich Solo", subtitle: "Crispy Chicken Sandwich Solo", add: 70 },
+                { name: "McFlurry® with OREO®", subtitle: "McFlurry® with OREO®", add: 72 },
+                { name: "1-pc. Chicken McDo Solo", subtitle: "1-pc. Chicken McDo Solo", add: 96 },
+                { name: "Galaxy Truffle Mushroom Double Cheeseburger", subtitle: "Galaxy Truffle Mushroom Double Cheeseburger", add: 168 },
+                { name: "Double Quarter Pounder w/ Cheese Solo", subtitle: "Double Quarter Pounder w/ Cheese Solo", add: 259 },
+                { name: "Quarter Pounder w/ Cheese, Lettuce & Tomatoes", subtitle: "Quarter Pounder w/ Cheese, Lettuce & Tomatoes", add: 231 },
+                { name: "6-pc. Chicken McShare Box", subtitle: "6-pc. Chicken McShare Box", add: 515 },
+                { name: "6-pc. Chicken McShare Box", subtitle: "6-pc. Chicken McShare Box", add: 515 }
+            ]
+        },
+        "1-pc. Chicken McDo Medium Meal": {
+            choiceGroups: [
+                {
+                    heading: "Choose your Drink",
+                    subtext: "Select 1",
+                    badges: ["Required", "Completed"],
+                    inputType: "radio",
+                    maxSelect: 1,
+                    options: [
+                        { name: "Coke Medium", add: 0, priceText: "Free" },
+                        { name: "Coke Large", add: 9 },
+                        { name: "Sprite Medium", add: 0, priceText: "Free" },
+                        { name: "Sprite Large", add: 9 },
+                        { name: "Coke Zero Medium", add: 0, priceText: "Free" }
+                    ]
+                }
+            ],
+            frequentlyBoughtTogether: [
+                { name: "Extra Gravy", subtitle: "Extra Gravy", add: 11 },
+                { name: "Burger McDo Solo", subtitle: "Burger McDo Solo", add: 52 },
+                { name: "Medium Fries", subtitle: "Medium Fries", add: 95 },
+                { name: "Hot Fudge Sundae", subtitle: "Hot Fudge Sundae", add: 59 },
+                { name: "McFlurry® with OREO®", subtitle: "McFlurry® with OREO®", add: 72 },
+                { name: "Crispy Chicken Sandwich Solo", subtitle: "Crispy Chicken Sandwich Solo", add: 70 },
+                { name: "1-pc. Chicken McDo Solo", subtitle: "1-pc. Chicken McDo Solo", add: 96 },
+                { name: "Cheeseburger, Twister Fries, and Royal McFloat Meal", subtitle: "Cheeseburger, Twister Fries, and Royal McFloat Meal", add: 175 },
+                { name: "Cheeseburger, Twister Fries, and Royal McFloat Meal", subtitle: "Cheeseburger, Twister Fries, and Royal McFloat Meal", add: 175 },
+                { name: "Regular Fries", subtitle: "Regular Fries", add: 72 }
+            ]
+        },
+        "McShaker Fries Large Cheese": {
+            choiceGroups: [],
+            frequentlyBoughtTogether: []
+        },
+        "Coke McFloat Large": {
+            choiceGroups: [],
+            frequentlyBoughtTogether: []
+        }
+    };
+
+    return configs[item.name] || defaults;
+}
+
+function renderModalSelections(item) {
+    const choiceGroupContainer = document.getElementById("modalChoiceGroups");
+    const addonList = document.getElementById("modalAddonList");
+    const fbtBox = document.getElementById("fbtBox");
+    if (!choiceGroupContainer || !addonList || !fbtBox) return;
+
+    const config = getModalConfig(item);
+    const groups = config.choiceGroups || [];
+    if (!groups.length) {
+        choiceGroupContainer.innerHTML = "";
+        choiceGroupContainer.hidden = true;
+    } else {
+        choiceGroupContainer.hidden = false;
+        choiceGroupContainer.innerHTML = groups.map((group, groupIndex) => `
+            <div class="option-box">
+                <div class="option-title">
+                    <div>
+                        <h3>${group.heading}</h3>
+                        <p>${group.subtext || ""}</p>
+                    </div>
+                    <div class="option-badges">${(group.badges || []).map(badge => `<span class="optional-badge">${badge}</span>`).join("")}</div>
+                </div>
+                ${(group.options || []).map((choice, choiceIndex) => `
+                    <label class="option-row">
+                        <input class="modal-choice-input" type="${group.inputType || "checkbox"}" name="choiceGroup${groupIndex}" value="${choice.name}" data-price="${choice.add}" ${(group.inputType === "radio" && choiceIndex === 0) ? "checked" : ""}>
+                        <span>${choice.name}${choice.note ? ` <small>${choice.note}</small>` : ""}</span>
+                        <strong>${choice.priceText ? choice.priceText : (group.inputType === "radio" ? `₱${item.price + choice.add}` : `+ ₱${choice.add}`)}</strong>
+                    </label>
+                `).join("")}
+            </div>
+        `).join("");
+
+        groups.forEach((group, groupIndex) => {
+            if (!group.maxSelect || group.inputType !== "checkbox") return;
+            const selector = `input[name="choiceGroup${groupIndex}"]`;
+            document.querySelectorAll(selector).forEach(input => {
+                input.addEventListener("change", () => {
+                    const checked = document.querySelectorAll(`${selector}:checked`);
+                    if (checked.length > group.maxSelect) {
+                        input.checked = false;
+                        alert(`You can only select up to ${group.maxSelect} in ${group.heading}.`);
+                    }
+                });
+            });
+        });
+    }
+
+    if (!config.frequentlyBoughtTogether?.length) {
+        addonList.innerHTML = "";
+        fbtBox.hidden = true;
+        return;
+    }
+    fbtBox.hidden = false;
+
+    addonList.innerHTML = config.frequentlyBoughtTogether.map(addon => `
+        <label class="addon-row">
+            <span>${addon.name}${addon.subtitle ? `<small>${addon.subtitle}</small>` : ""}</span>
+            <strong>+ ₱${addon.add}</strong>
+            <input type="checkbox" name="fbt" value="${addon.name}" data-price="${addon.add}">
+        </label>
+    `).join("");
 }
 
 document.getElementById("foodModalClose").addEventListener("click", () => {
@@ -326,25 +748,29 @@ document.getElementById("qtyPlus").addEventListener("click", () => {
 document.getElementById("modalAddCart").addEventListener("click", () => {
     if (!selectedFood) return;
 
-    const variation = document.querySelector("input[name='variation']:checked");
-    const variationName = variation.value;
-    const variationAdd = Number(variation.dataset.price || 0);
+    let choiceTotal = 0;
+    const selectedChoices = [];
+    document.querySelectorAll(".modal-choice-input:checked").forEach(choice => {
+        choiceTotal += Number(choice.dataset.price || 0);
+        selectedChoices.push(choice.value);
+    });
 
     let addonTotal = 0;
     const addonNames = [];
-
-    document.querySelectorAll(".addon-row input:checked").forEach(addon => {
+    document.querySelectorAll("input[name='fbt']:checked").forEach(addon => {
         addonTotal += Number(addon.dataset.price || 0);
-        addonNames.push(addon.closest(".addon-row").querySelector("span").textContent.trim());
+        addonNames.push(addon.value);
     });
 
-    const finalPrice = (selectedFood.price + variationAdd + addonTotal) * modalQty;
+    const finalPrice = (selectedFood.price + choiceTotal + addonTotal) * modalQty;
 
     cart.push({
-        name: `${selectedFood.name} (${variationName})`,
+        name: selectedFood.name,
         price: finalPrice,
         qty: modalQty,
-        addons: addonNames
+        addons: [...selectedChoices, ...addonNames],
+        specialInstructions: document.getElementById("modalSpecialInstructions").value.trim(),
+        unavailableAction: document.getElementById("modalUnavailableAction").value
     });
 
     updateCart();
@@ -403,8 +829,78 @@ document.getElementById("pickupTab").addEventListener("click", () => {
     document.getElementById("deliveryTab").classList.remove("active");
 });
 
+function openLocationModal() {
+    const modal = document.getElementById("locationModal");
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    if (!locationMap && window.L) {
+        locationMap = L.map("liveMap").setView([13.4090, 123.3720], 15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(locationMap);
+
+        locationMap.on("click", (event) => {
+            const { lat, lng } = event.latlng;
+            pinnedLat = lat;
+            pinnedLng = lng;
+
+            if (!locationMarker) {
+                locationMarker = L.marker([lat, lng]).addTo(locationMap);
+            } else {
+                locationMarker.setLatLng([lat, lng]);
+            }
+
+            const shortLat = lat.toFixed(5);
+            const shortLng = lng.toFixed(5);
+            document.getElementById("selectedLocationText").textContent = `Pinned at ${shortLat}, ${shortLng}`;
+            document.getElementById("locationCaption").textContent = `Selected map point: ${shortLat}, ${shortLng}`;
+        });
+    }
+
+    if (locationMap) {
+        setTimeout(() => locationMap.invalidateSize(), 120);
+    }
+}
+
+function closeLocationModal() {
+    const modal = document.getElementById("locationModal");
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = "";
+}
+
 document.getElementById("locationBtn").addEventListener("click", () => {
-    alert("Change location feature is for prototype only.");
+    openLocationModal();
+});
+
+document.getElementById("locationModalClose").addEventListener("click", closeLocationModal);
+
+document.getElementById("locationModal").addEventListener("click", (event) => {
+    if (event.target.id === "locationModal") {
+        closeLocationModal();
+    }
+});
+
+document.getElementById("locationSubmitAddress").addEventListener("click", () => {
+    const addressInput = document.getElementById("locationAddressInput");
+    const locationDisplay = document.getElementById("locationDisplay");
+    const typedAddress = addressInput.value.trim();
+
+    if (typedAddress) {
+        locationDisplay.textContent = typedAddress;
+        closeLocationModal();
+        return;
+    }
+
+    if (pinnedLat !== null && pinnedLng !== null) {
+        locationDisplay.textContent = `${pinnedLat.toFixed(5)}, ${pinnedLng.toFixed(5)}`;
+        closeLocationModal();
+        return;
+    }
+
+    alert("Please enter an address or pick a point on the map.");
 });
 
 document.getElementById("accountBtn").addEventListener("click", () => {

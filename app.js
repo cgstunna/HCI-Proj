@@ -191,11 +191,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* CHAT SUPPORT */
 
+    const ensureChatModal = () => {
+        let chatModal = document.getElementById('chatModal');
+        if (chatModal) return chatModal;
+
+        const modalMarkup = `
+            <div id="chatModal" class="chat-modal" role="dialog" aria-modal="true" aria-labelledby="chatModalTitle" hidden>
+                <div class="chat-modal__panel">
+                    <button type="button" class="chat-modal__close" id="chatModalClose" aria-label="Close">&times;</button>
+                    <h2 id="chatModalTitle" class="chat-modal__title">How can we help?</h2>
+                    <p class="chat-modal__lead">Choose a quick concern or send a message and support will get back to you.</p>
+                    <div class="chat-modal__chips">
+                        <button type="button" class="chat-modal__chip">Order status</button>
+                        <button type="button" class="chat-modal__chip">Payment issue</button>
+                        <button type="button" class="chat-modal__chip">Cancel order</button>
+                        <button type="button" class="chat-modal__chip">Promo concerns</button>
+                    </div>
+                    <label class="chat-modal__label" for="chatMessageInput">Message</label>
+                    <textarea id="chatMessageInput" class="chat-modal__textarea" rows="4" placeholder="Type your concern here..."></textarea>
+                    <button type="button" class="chat-modal__send" id="chatSendBtn">Send message</button>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalMarkup);
+        return document.getElementById('chatModal');
+    };
+
+    const openChatModal = () => {
+        const chatModal = ensureChatModal();
+        if (!chatModal) return;
+        chatModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeChatModal = () => {
+        const chatModal = document.getElementById('chatModal');
+        if (!chatModal) return;
+        chatModal.hidden = true;
+        document.body.style.overflow = '';
+    };
+
     document.querySelectorAll('.chat-support').forEach(btn => {
         btn.addEventListener('click', e => {
             e.preventDefault();
-            showToast('Chat support is for prototype only.');
+            openChatModal();
         });
+    });
+
+    document.addEventListener('click', e => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+
+        if (target.id === 'chatModalClose') {
+            closeChatModal();
+            return;
+        }
+
+        const chatModal = document.getElementById('chatModal');
+        if (target === chatModal) {
+            closeChatModal();
+            return;
+        }
+
+        if (target.classList.contains('chat-modal__chip')) {
+            const input = document.getElementById('chatMessageInput');
+            if (input instanceof HTMLTextAreaElement) {
+                input.value = target.textContent?.trim() || '';
+                input.focus();
+            }
+            return;
+        }
+
+        if (target.id === 'chatSendBtn') {
+            const input = document.getElementById('chatMessageInput');
+            const message = input instanceof HTMLTextAreaElement ? input.value.trim() : '';
+
+            if (!message) {
+                showToast('Please enter your concern first.');
+                return;
+            }
+
+            showToast('Message sent. Our support team will reply soon.');
+            if (input instanceof HTMLTextAreaElement) input.value = '';
+            closeChatModal();
+        }
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        const chatModal = document.getElementById('chatModal');
+        if (chatModal && !chatModal.hidden) {
+            closeChatModal();
+        }
     });
 
     /* CHECKOUT / REVIEW PAGE BUTTONS */
@@ -326,47 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                 <span>Required</span>
                             </div>
-
-                            <label class="option-row">
-                                <input type="radio" name="variation" value="Solo" data-price="0" checked>
-                                <span>Solo</span>
-                                <strong id="soloPrice"></strong>
-                            </label>
-
-                            <label class="option-row">
-                                <input type="radio" name="variation" value="With Drink" data-price="30">
-                                <span>With Drink</span>
-                                <strong id="drinkPrice"></strong>
-                            </label>
-
-                            <label class="option-row">
-                                <input type="radio" name="variation" value="Busog Upgrade" data-price="49">
-                                <span>Busog Upgrade <small>1 Small Drink, 1 Plain Rice, and 1 extra sauce</small></span>
-                                <strong id="upgradePrice"></strong>
-                            </label>
+                            <div id="modalVariationList"></div>
                         </div>
 
                         <div class="addons-box">
                             <h3>Frequently bought together</h3>
                             <p>Other consumers also ordered these</p>
-
-                            <label class="addon-row">
-                                <span>Chicken Oil</span>
-                                <strong>+ ₱7</strong>
-                                <input type="checkbox" data-price="7">
-                            </label>
-
-                            <label class="addon-row">
-                                <span>Soup</span>
-                                <strong>+ ₱12</strong>
-                                <input type="checkbox" data-price="12">
-                            </label>
-
-                            <label class="addon-row">
-                                <span>Toyomansi</span>
-                                <strong>+ ₱7</strong>
-                                <input type="checkbox" data-price="7">
-                            </label>
+                            <div id="modalAddonList"></div>
                         </div>
 
                         <div class="modal-bottom">
@@ -406,6 +460,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!selectedFood) return;
 
                 const variation = document.querySelector("input[name='variation']:checked");
+                if (!variation) {
+                    showToast('Please select a variation.');
+                    return;
+                }
+
                 const variationName = variation.value;
                 const variationAdd = Number(variation.dataset.price || 0);
 
@@ -431,6 +490,82 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
+        const getModalConfig = (item) => {
+            const defaults = {
+                variations: [
+                    { name: 'Solo', add: 0 },
+                    { name: 'With Drink', add: 30 },
+                    { name: 'Busog Upgrade', add: 49, note: '1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi' }
+                ],
+                addons: [
+                    { name: 'Chicken Oil', add: 7 },
+                    { name: 'Soup', add: 12 },
+                    { name: 'Toyomansi', add: 7 }
+                ]
+            };
+
+            const itemConfigs = {
+                '1-pc. Chickenjoy w/ Drink': {
+                    variations: [
+                        { name: 'Solo', add: 0 },
+                        { name: 'With Drink', add: 30 },
+                        { name: 'Busog Upgrade', add: 49, note: '1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi' }
+                    ],
+                    addons: defaults.addons
+                },
+                'Jolly Spaghetti': {
+                    variations: [
+                        { name: 'Solo', add: 0 },
+                        { name: 'With Drink', add: 30 },
+                        { name: 'Busog Upgrade', add: 49, note: '1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi' }
+                    ],
+                    addons: defaults.addons
+                },
+                'Yumburger': {
+                    variations: [
+                        { name: 'Solo', add: 0 },
+                        { name: 'With Drink', add: 30 },
+                        { name: 'Busog Upgrade', add: 49, note: '1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi' }
+                    ],
+                    addons: defaults.addons
+                },
+                'Peach Mango Pie': {
+                    variations: [
+                        { name: 'Solo', add: 0 },
+                        { name: 'With Drink', add: 30 },
+                        { name: 'Busog Upgrade', add: 49, note: '1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi' }
+                    ],
+                    addons: defaults.addons
+                }
+            };
+
+            return itemConfigs[item.name] || defaults;
+        };
+
+        const renderModalSelections = (item) => {
+            const variationList = document.getElementById('modalVariationList');
+            const addonList = document.getElementById('modalAddonList');
+            if (!variationList || !addonList) return;
+
+            const config = getModalConfig(item);
+
+            variationList.innerHTML = config.variations.map((variation, index) => `
+                <label class="option-row">
+                    <input type="radio" name="variation" value="${variation.name}" data-price="${variation.add}" ${index === 0 ? 'checked' : ''}>
+                    <span>${variation.name}${variation.note ? ` <small>${variation.note}</small>` : ''}</span>
+                    <strong>₱${item.price + variation.add}</strong>
+                </label>
+            `).join('');
+
+            addonList.innerHTML = config.addons.map(addon => `
+                <label class="addon-row">
+                    <span>${addon.name}</span>
+                    <strong>+ ₱${addon.add}</strong>
+                    <input type="checkbox" data-price="${addon.add}">
+                </label>
+            `).join('');
+        };
+
         const openFoodModal = (item) => {
             createFoodModal();
 
@@ -441,14 +576,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('modalFoodName').textContent = item.name;
             document.getElementById('modalFoodPrice').textContent = `₱${item.price}`;
             document.getElementById('modalFoodDesc').textContent = item.desc || `${item.name} meal`;
-
-            document.getElementById('soloPrice').textContent = `₱${item.price}`;
-            document.getElementById('drinkPrice').textContent = `₱${item.price + 30}`;
-            document.getElementById('upgradePrice').textContent = `₱${item.price + 49}`;
+            renderModalSelections(item);
             document.getElementById('modalQty').textContent = '1';
-
-            document.querySelectorAll("input[name='variation']")[0].checked = true;
-            document.querySelectorAll('.addon-row input').forEach(input => input.checked = false);
 
             document.getElementById('foodModal').hidden = false;
         };
