@@ -284,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (value) {
             updateLocationDisplays(value, 'Updated from typed delivery address');
+            try { localStorage.setItem('deliveryAddressText', value); } catch (_e) {}
             closeLocationModal();
             return;
         }
@@ -292,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pinText = `${pinnedLat.toFixed(5)}, ${pinnedLng.toFixed(5)}`;
             updateLocationDisplays(`Pinned Location (${pinText})`, `Coordinates: ${pinText}`);
             setPreviewMapPin(pinnedLat, pinnedLng);
+            try { localStorage.setItem('deliveryPin', JSON.stringify({ lat: pinnedLat, lng: pinnedLng })); } catch (_e) {}
             closeLocationModal();
             return;
         }
@@ -688,6 +690,255 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     hydrateReviewOrder();
+
+    /* CONFIRM PAYMENT (REVIEW PAGE) */
+
+    const confirmPaymentModal = document.getElementById('confirmPaymentModal');
+    const openConfirmPaymentModal = () => {
+        if (!confirmPaymentModal || !currentReviewPayload?.items?.length) return;
+
+        const restaurantNameText = (currentReviewPayload.restaurantName || '').trim() || 'Restaurant';
+        const total = Number(currentReviewPayload.total || 0);
+        const serviceFee = total > 0 ? 5 : 0;
+        const grandTotal = total + serviceFee;
+
+        const activePayment = document.querySelector('.payment-grid .option-btn.active');
+        const paymentMethod = activePayment ? activePayment.textContent.replace(/\s+/g, ' ').trim() : 'Selected method';
+
+        document.getElementById('confirmPayRestaurant').textContent = restaurantNameText;
+        document.getElementById('confirmPayMethod').textContent = paymentMethod;
+        document.getElementById('confirmPayTotal').textContent = `₱ ${grandTotal}`;
+        document.getElementById('confirmPaySubtotal').textContent = `₱${total}`;
+        document.getElementById('confirmPayFee').textContent = serviceFee > 0 ? `₱${serviceFee}` : 'Free';
+
+        const itemsEl = document.getElementById('confirmPayItems');
+        if (itemsEl) {
+            itemsEl.innerHTML = currentReviewPayload.items.map(item => `
+                <div class="confirm-pay__item">
+                    <div class="confirm-pay__thumb">${item.img ? `<img src="${item.img}" alt="${item.name}">` : ''}</div>
+                    <div>
+                        <div class="confirm-pay__name">${item.qty}× ${item.name}</div>
+                        ${item.addons?.length ? `<div class="confirm-pay__sub">${item.addons.join(', ')}</div>` : `<div class="confirm-pay__sub"> </div>`}
+                    </div>
+                    <div class="confirm-pay__price">₱ ${item.price}</div>
+                </div>
+            `).join('');
+        }
+
+        confirmPaymentModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeConfirmPaymentModal = () => {
+        if (!confirmPaymentModal) return;
+        confirmPaymentModal.hidden = true;
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('reviewPlaceOrderBtn')?.addEventListener('click', () => {
+        openConfirmPaymentModal();
+    });
+
+    document.getElementById('confirmPaymentClose')?.addEventListener('click', closeConfirmPaymentModal);
+    document.getElementById('confirmPaymentCancel')?.addEventListener('click', closeConfirmPaymentModal);
+    confirmPaymentModal?.addEventListener('click', e => {
+        if (e.target === confirmPaymentModal) closeConfirmPaymentModal();
+    });
+
+    const placeOrderAndGoOngoing = () => {
+        if (!currentReviewPayload?.items?.length) return;
+
+        const ordersKey = 'orders';
+        let orders = [];
+        try {
+            orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+            if (!Array.isArray(orders)) orders = [];
+        } catch {
+            orders = [];
+        }
+
+        const id = `ord_${Date.now()}`;
+        const serviceFee = Number(currentReviewPayload.total || 0) > 0 ? 5 : 0;
+        let deliveryPin = null;
+        let deliveryAddressText = null;
+        try { deliveryPin = JSON.parse(localStorage.getItem('deliveryPin') || 'null'); } catch { deliveryPin = null; }
+        try { deliveryAddressText = localStorage.getItem('deliveryAddressText'); } catch { deliveryAddressText = null; }
+
+        const orderRecord = {
+            id,
+            status: 'ongoing',
+            createdAt: Date.now(),
+            restaurantKey: currentReviewPayload.restaurantKey,
+            restaurantName: currentReviewPayload.restaurantName,
+            restaurantLogo: currentReviewPayload.restaurantLogo,
+            items: currentReviewPayload.items,
+            total: Number(currentReviewPayload.total || 0),
+            serviceFee,
+            deliveryPin,
+            deliveryAddressText
+        };
+
+        orders.unshift(orderRecord);
+        try { localStorage.setItem(ordersKey, JSON.stringify(orders)); } catch (_e) {}
+        try { localStorage.setItem('lastOrderId', id); } catch (_e) {}
+
+        // Clear checkoutCart so next session starts clean
+        try { sessionStorage.removeItem('checkoutCart'); } catch (_e) {}
+        try { localStorage.removeItem('checkoutCart'); } catch (_e) {}
+
+        window.location.href = '/ongoing';
+    };
+
+    document.getElementById('confirmPaymentConfirm')?.addEventListener('click', () => {
+        closeConfirmPaymentModal();
+        placeOrderAndGoOngoing();
+    });
+
+    /* ONGOING ORDERS PAGE */
+
+    const hydrateOngoingOrders = () => {
+        const ongoingCard = document.getElementById('ongoingOrderCard');
+        if (!ongoingCard) return;
+
+        let orders = [];
+        try {
+            orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            if (!Array.isArray(orders)) orders = [];
+        } catch {
+            orders = [];
+        }
+
+        const lastId = localStorage.getItem('lastOrderId');
+        const ongoing = orders.find(o => o.status === 'ongoing' && (!lastId || o.id === lastId)) || orders.find(o => o.status === 'ongoing');
+
+        const nameEl = document.getElementById('ongoingRestaurantName');
+        const metaEl = document.getElementById('ongoingOrderMeta');
+        const logoEl = document.getElementById('ongoingRestaurantLogo');
+        const trackBtn = document.getElementById('trackOrderBtn');
+
+        if (!ongoing) {
+            if (nameEl) nameEl.textContent = 'No active order';
+            if (metaEl) metaEl.textContent = 'Place an order to see it here.';
+            if (trackBtn) trackBtn.disabled = true;
+            return;
+        }
+
+        if (nameEl) nameEl.textContent = ongoing.restaurantName || 'Restaurant';
+        if (metaEl) metaEl.textContent = `${ongoing.items?.length || 0} item(s) • Total ₱ ${Number(ongoing.total || 0) + Number(ongoing.serviceFee || 0)}`;
+        if (logoEl && ongoing.restaurantLogo) logoEl.src = ongoing.restaurantLogo;
+        if (trackBtn) {
+            trackBtn.disabled = false;
+            trackBtn.addEventListener('click', () => {
+                window.location.href = '/tracking';
+            });
+        }
+
+        const completedEl = document.getElementById('completedOrders');
+        if (completedEl) {
+            const completed = orders.filter(o => o.status === 'completed').slice(0, 5);
+            if (!completed.length) {
+                completedEl.textContent = 'No completed orders yet.';
+            } else {
+                completedEl.innerHTML = completed.map(o => `
+                    <div class="address-card" style="align-items:center;">
+                        <div class="rest-logo-small">${o.restaurantLogo ? `<img src="${o.restaurantLogo}" alt="Restaurant logo">` : ''}</div>
+                        <div style="flex:1;">
+                            <strong>${o.restaurantName || 'Restaurant'}</strong>
+                            <div class="text-muted text-sm">${o.items?.length || 0} item(s) • Total ₱ ${Number(o.total || 0) + Number(o.serviceFee || 0)}</div>
+                        </div>
+                        <span class="text-muted text-sm">Delivered</span>
+                    </div>
+                `).join('');
+            }
+        }
+    };
+
+    hydrateOngoingOrders();
+
+    /* TRACKING PAGE */
+
+    const hydrateTrackingPage = () => {
+        const trackingMapEl = document.getElementById('trackingMap');
+        if (!trackingMapEl) return;
+
+        let orders = [];
+        try {
+            orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            if (!Array.isArray(orders)) orders = [];
+        } catch {
+            orders = [];
+        }
+
+        const lastId = localStorage.getItem('lastOrderId');
+        const order = orders.find(o => o.id === lastId) || orders.find(o => o.status === 'ongoing') || orders[0];
+        if (!order) return;
+
+        const restaurantEl = document.getElementById('trackingRestaurant');
+        const itemsPreviewEl = document.getElementById('trackingItemsPreview');
+        const orderIdEl = document.getElementById('trackingOrderId');
+        const etaRangeEl = document.getElementById('trackingEtaRange');
+        const etaSubEl = document.getElementById('trackingEtaSub');
+        const thumbEl = document.getElementById('trackingThumb');
+
+        if (restaurantEl) restaurantEl.textContent = order.restaurantName || 'Restaurant';
+        if (orderIdEl) orderIdEl.textContent = `Order #${(order.id || '').replace('ord_', '')}`;
+
+        const items = Array.isArray(order.items) ? order.items : [];
+        if (itemsPreviewEl) {
+            const preview = items.slice(0, 2).map(i => `${i.qty}× ${i.name}`).join(' • ');
+            itemsPreviewEl.textContent = preview || '—';
+        }
+
+        if (thumbEl) {
+            const firstImg = items.find(i => i.img)?.img;
+            thumbEl.innerHTML = firstImg ? `<img src="${firstImg}" alt="Order item">` : '';
+        }
+
+        const createdAt = Number(order.createdAt || Date.now());
+        const now = Date.now();
+        const minMs = 20 * 60 * 1000;
+        const maxMs = 25 * 60 * 1000;
+        const etaMin = new Date(createdAt + minMs);
+        const etaMax = new Date(createdAt + maxMs);
+        const fmt = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (etaRangeEl) etaRangeEl.textContent = `Estimated Arrival: ${fmt(etaMin)} - ${fmt(etaMax)}`;
+        const remainingMin = Math.max(1, Math.round((createdAt + maxMs - now) / 60000));
+        if (etaSubEl) etaSubEl.textContent = `Arriving in ~${remainingMin} mins`;
+
+        // Destination defaults to Iriga area if no pin saved.
+        const destination = (order.deliveryPin && typeof order.deliveryPin.lat === 'number' && typeof order.deliveryPin.lng === 'number')
+            ? [order.deliveryPin.lat, order.deliveryPin.lng]
+            : [13.40755, 123.37466];
+
+        // Fake rider start point slightly away from destination.
+        const riderStart = [destination[0] - 0.006, destination[1] - 0.006];
+
+        if (!window.L) return;
+        const map = window.L.map('trackingMap').setView(destination, 14);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const destMarker = window.L.marker(destination).addTo(map);
+        const riderMarker = window.L.marker(riderStart).addTo(map);
+        const path = window.L.polyline([riderStart, destination], { color: '#d70f64', weight: 4, opacity: 0.9 }).addTo(map);
+        map.fitBounds(path.getBounds(), { padding: [20, 20] });
+
+        // Animate rider moving to destination
+        let t = 0;
+        const steps = 120;
+        const tickMs = 1000;
+        const interval = setInterval(() => {
+            t += 1;
+            const p = Math.min(1, t / steps);
+            const lat = riderStart[0] + (destination[0] - riderStart[0]) * p;
+            const lng = riderStart[1] + (destination[1] - riderStart[1]) * p;
+            riderMarker.setLatLng([lat, lng]);
+            if (p >= 1) clearInterval(interval);
+        }, tickMs);
+    };
+
+    hydrateTrackingPage();
 
     // Keep latest review payload available after any page refresh.
     document.addEventListener('visibilitychange', () => {
@@ -1116,7 +1367,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bindNavigation('.header-logo', '/');
     bindNavigation('.header-nav .nav-item:nth-child(3)', '/tracking');
-    bindNavigation('.checkout-btn', '/tracking');
+    // Do NOT bind all `.checkout-btn` globally; review page uses it for Place Order modal.
+    bindNavigation('.go-tracking', '/tracking');
 
     updateResults();
 });

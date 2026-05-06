@@ -128,7 +128,7 @@
                             <div class="row text-sm"><span class="text-muted">Service Fee</span><span id="reviewServiceFee" class="text-muted">₱5</span></div>
                             <div class="row total-row mt-2"><strong>Total</strong> <small class="text-muted font-normal">(incl. fees and tax)</small> <strong id="reviewGrandTotal">₱ 723</strong></div>
                         </div>
-                        <button id="reviewPlaceOrderBtn" class="primary-btn checkout-btn full-width mt-4" onclick="window.location.href='/tracking'">Place Order ₱ 723</button>
+                        <button id="reviewPlaceOrderBtn" type="button" class="primary-btn checkout-btn full-width mt-4">Place Order ₱ 723</button>
                     </div>
                 </div>
             </div>
@@ -183,6 +183,50 @@
                 <h2 class="main-heading" style="font-size: 22px; margin-bottom: 8px;">Add more items</h2>
                 <p class="text-muted" style="margin-bottom: 14px;">Select an item to add to your current order.</p>
                 <div id="reviewAddItemList" class="cart-items-list"></div>
+            </div>
+        </div>
+
+        <div id="confirmPaymentModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="confirmPaymentTitle" hidden>
+            <div class="location-modal__panel confirm-pay">
+                <button type="button" class="location-modal__close" id="confirmPaymentClose" aria-label="Close">&times;</button>
+                <h2 id="confirmPaymentTitle" class="main-heading" style="font-size: 22px; margin-bottom: 6px;">Confirm payment</h2>
+                <p class="text-muted" style="margin-bottom: 14px;">Review your order total and complete checkout.</p>
+
+                <div class="confirm-pay__summary">
+                    <div class="confirm-pay__meta">
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Order from</span>
+                            <span id="confirmPayRestaurant" class="text-muted">—</span>
+                        </div>
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Payment method</span>
+                            <span id="confirmPayMethod" class="text-muted">—</span>
+                        </div>
+                    </div>
+
+                    <div class="confirm-pay__items" id="confirmPayItems"></div>
+
+                    <div class="confirm-pay__totals">
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Subtotal</span>
+                            <span id="confirmPaySubtotal" class="text-muted">₱0</span>
+                        </div>
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Service fee</span>
+                            <span id="confirmPayFee" class="text-muted">₱0</span>
+                        </div>
+                        <div class="confirm-pay__divider"></div>
+                        <div class="confirm-pay__row confirm-pay__row--total">
+                            <strong>Total</strong>
+                            <strong id="confirmPayTotal">₱ 0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="confirm-pay__actions">
+                    <button type="button" id="confirmPaymentCancel" class="confirm-pay__btn confirm-pay__btn--ghost">Cancel</button>
+                    <button type="button" id="confirmPaymentConfirm" class="confirm-pay__btn confirm-pay__btn--primary">Confirm &amp; place order</button>
+                </div>
             </div>
         </div>
 

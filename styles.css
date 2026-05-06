@@ -2499,6 +2499,127 @@ html, body {
     height: 40px;
 }
 
+/* Confirm payment modal */
+
+.confirm-pay {
+    max-width: 520px;
+    width: min(520px, 92vw);
+}
+
+.confirm-pay__summary {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.confirm-pay__meta {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.confirm-pay__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.confirm-pay__items {
+    max-height: 180px;
+    overflow: auto;
+    border-top: 1px solid #f2f2f2;
+    border-bottom: 1px solid #f2f2f2;
+    padding: 10px 0;
+    margin: 10px 0;
+}
+
+.confirm-pay__item {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.confirm-pay__thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.confirm-pay__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.confirm-pay__name {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.confirm-pay__sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.confirm-pay__price {
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.confirm-pay__totals {
+    display: grid;
+    gap: 8px;
+}
+
+.confirm-pay__divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 4px 0;
+}
+
+.confirm-pay__row--total {
+    font-size: 16px;
+}
+
+.confirm-pay__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.confirm-pay__btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.confirm-pay__btn--ghost {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.confirm-pay__btn--primary {
+    background: var(--primary-gradient);
+    color: #fff;
+}
+
+.confirm-pay__btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .modal-bottom {
     display: grid;
     grid-template-columns: 100px 1fr;

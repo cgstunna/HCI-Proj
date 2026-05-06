@@ -6,21 +6,21 @@
     <title>PandaBites</title>
     <link rel="icon" type="image/png" href="assets/logos/Bar logo.PNG">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
     <div class="window-frame">
         <div class="app-container">
             <header class="header">
-                <div class="header-logo" onclick="window.location.href='/'">
-                    <img src="assets/logos/foodpanda icon.png" alt="Foodpanda logo"
+                <div class="header-logo go-home" onclick="window.location.href='/'">
+                    <img src="assets/logos/pandabites.png" alt="PandaBites logo"
                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
-                    <span>foodpanda</span>
                 </div>
                 <div class="flex-grow"></div>
                 <div class="header-auth">
-                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Carl Gerald" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Carl Gerald <span class="header-menu-chev" aria-hidden="true"></span></div>
-                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> ENG </div>
-                    <div class="nav-item cart-icon header-menu-trigger" data-header-menu="cart" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
+                    <div class="nav-item"><span class="icon text-primary">👤</span> Account</div>
+                    <div class="nav-item"><span class="icon text-primary">🌐</span> EN</div>
                 </div>
             </header>
 
@@ -75,11 +75,11 @@
                             </button>
                         </div>
                         <div id="orderSummaryBody" class="summary-preview flex-start gap-4">
-                            <div class="food-thumb-small" style="width: 80px; height: 60px;"></div>
+                            <div class="food-thumb-small" style="width: 80px; height: 60px;" id="trackingThumb"></div>
                             <div>
-                                <h4 class="m-0">Mang Inasal - Iriga City</h4>
-                                <p class="text-sm m-0 mt-1">1 pc. Pecho Large PM2</p>
-                                <p class="text-sm text-muted m-0 mt-1">Order #1234567890</p>
+                                <h4 class="m-0" id="trackingRestaurant">—</h4>
+                                <div class="text-sm m-0 mt-1" id="trackingItemsPreview">—</div>
+                                <p class="text-sm text-muted m-0 mt-1" id="trackingOrderId">Order #—</p>
                             </div>
                         </div>
                     </div>
@@ -90,15 +90,11 @@
                         <div class="arrival-header">
                             <div class="clock-icon bg-primary text-white">🕒</div>
                             <div>
-                                <h3 class="m-0">Estimated Arrival: 8:10 PM - 8:35 PM</h3>
-                                <p class="text-muted text-sm m-0 mt-1">Arriving in 20-25 mins</p>
+                                <h3 class="m-0" id="trackingEtaRange">Estimated Arrival: —</h3>
+                                <p class="text-muted text-sm m-0 mt-1" id="trackingEtaSub">Arriving soon</p>
                             </div>
                         </div>
-                        <div class="map-container" style="height: 250px; background-color: #fce4ec;">
-                            <div style="padding: 20px; text-align: center; color: var(--primary);">
-                                [Map Image Placeholder]
-                            </div>
-                        </div>
+                        <div class="map-container" style="height: 250px; background-color: #fce4ec;" id="trackingMap"></div>
                     </div>
                 </div>
             </div>

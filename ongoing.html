@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PandaBites</title>
+    <link rel="icon" type="image/png" href="assets/logos/Bar logo.PNG">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="window-frame">
+        <div class="app-container">
+            <header class="header">
+                <div class="header-logo" onclick="window.location.href='/'">
+                    <img src="assets/logos/pandabites.png" alt="PandaBites logo">
+                </div>
+                <div class="flex-grow"></div>
+                <div class="header-auth">
+                    <div class="nav-item"><span class="icon text-primary">👤</span> Account</div>
+                    <div class="nav-item"><span class="icon text-primary">🌐</span> EN</div>
+                </div>
+            </header>
+
+            <h2 class="page-title main-heading">Orders</h2>
+
+            <div class="card-box" style="padding: 22px;">
+                <h3 style="margin-top:0;">Ongoing</h3>
+                <div id="ongoingOrderCard" class="address-card" style="align-items:center;">
+                    <div class="rest-logo-small">
+                        <img id="ongoingRestaurantLogo" src="assets/logos/support.png" alt="Restaurant logo">
+                    </div>
+                    <div style="flex:1;">
+                        <strong id="ongoingRestaurantName">No active order</strong>
+                        <div id="ongoingOrderMeta" class="text-muted text-sm">Place an order to see it here.</div>
+                    </div>
+                    <button id="trackOrderBtn" class="primary-btn" type="button" style="padding: 10px 14px; font-size: 14px;">Track order</button>
+                </div>
+            </div>
+
+            <div class="card-box" style="padding: 22px;">
+                <h3 style="margin-top:0;">Completed</h3>
+                <div id="completedOrders" class="text-muted text-sm">No completed orders yet.</div>
+            </div>
+
+            <a href="#" class="chat-support" aria-label="24/7 Chat Support">
+                <div class="support-img-wrapper">
+                    <img src="assets/logos/support.png" alt="">
+                </div>
+                <div class="chat-badge">24/7 Chat Support</div>
+            </a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
