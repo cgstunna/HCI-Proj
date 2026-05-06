@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foodpanda Redesign</title>
+
     <link rel="stylesheet" href="styles.css">
-    <style>
-    </style>
+
+    <!-- Live Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -16,10 +19,9 @@
             <header class="header">
                 <div class="header-left">
                     <div class="header-logo" onclick="window.location.href='/'">
-                        <img src="assets/logos/foodpanda icon.png" alt="Foodpanda logo"
-                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
-                        <span>foodpanda</span>
+                        <img src="assets/logos/pandabites.png" alt="PandaBites logo">
                     </div>
+
                     <div class="main-nav-pill">
                         <div class="nav-item active"><span class="icon">🛵</span> Delivery</div>
                         <div class="nav-item"><span class="icon">🏃</span> Pick-up</div>
@@ -32,6 +34,7 @@
                     <div class="nav-item"><span class="icon">🛍️</span> My Orders</div>
                     <div class="nav-item"><span class="icon" style="color:#d70f64;">♡</span></div>
                 </nav>
+
                 <div class="header-auth">
                     <div class="nav-item"><span class="icon">👤</span> Account</div>
                     <div class="nav-item">Sign up</div>
@@ -42,11 +45,12 @@
                 <div class="location-pill">
                     <span class="icon" style="color:#d70f64;">📍</span>
                     <span id="locationDisplay" class="text-muted">Find your current location...</span>
-                    <button type="button" class="change-btn" id="locationChangeBtn" aria-haspopup="dialog" aria-controls="locationModal">Change &gt;</button>
+                    <button type="button" class="change-btn" id="locationChangeBtn">Change &gt;</button>
                 </div>
+
                 <div class="search-input">
                     <span class="icon text-muted">🔍</span>
-                    <input id="restaurantSearch" type="text" placeholder="Search for restaurants, cuisines, dishes..." aria-label="Search restaurants">
+                    <input id="restaurantSearch" type="text" placeholder="Search for restaurants, cuisines, dishes...">
                 </div>
             </div>
 
@@ -56,50 +60,60 @@
 
                     <div class="categories">
                         <div class="category-card">
-                            <div class="cat-image-wrapper"><img src="images/cat_pizza.png" alt="Pizza"></div>
+                            <div class="cat-image-wrapper"><img src="assets/food/pizza.png" alt="Pizza"></div>
                             <span>Pizza</span>
                         </div>
+
                         <div class="category-card">
-                            <div class="cat-image-wrapper"><img src="images/cat_chicken.png" alt="Chicken"></div>
+                            <div class="cat-image-wrapper"><img src="assets/food/chicken.png" alt="Chicken"></div>
                             <span>Chicken</span>
                         </div>
+
                         <div class="category-card">
-                            <div class="cat-image-wrapper"><img src="images/cat_burger.png" alt="Burger"></div>
+                            <div class="cat-image-wrapper"><img src="assets/food/burger.png" alt="Burger"></div>
                             <span>Burger</span>
                         </div>
+
                         <div class="category-card">
-                            <div class="cat-image-wrapper"><img src="images/cat_coffee.png" alt="Coffee"></div>
+                            <div class="cat-image-wrapper"><img src="assets/food/drinks.png" alt="Coffee"></div>
                             <span>Coffee</span>
                         </div>
                     </div>
 
                     <div class="filters-row">
-                        <button type="button" class="filter-btn white-btn filter-control" data-filter="Fast Food"><span class="icon">🍔</span> Fast Food</button>
-                        <button type="button" class="filter-btn white-btn filter-control" data-filter="rating4" aria-pressed="false">
-                            <span class="filter-rating-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span><span>★</span><span class="is-dim">★</span></span>
+                        <button type="button" class="filter-btn white-btn filter-control" data-filter="Fast Food">
+                            <span class="icon">🍔</span> Fast Food
+                        </button>
+
+                        <button type="button" class="filter-btn white-btn filter-control" data-filter="rating4">
+                            <span class="filter-rating-stars">★★★★<span class="is-dim">★</span></span>
                             <span>Rating 4+</span>
                         </button>
+
                         <div class="filter-dropdown">
-                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger" id="filterPriceTrigger" aria-expanded="false" aria-haspopup="true" aria-controls="filterPricePanel">
-                                Price <span class="filter-chevron" aria-hidden="true"></span>
+                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger">
+                                Price <span class="filter-chevron"></span>
                             </button>
-                            <div id="filterPricePanel" class="filter-dropdown__panel" role="menu" hidden>
-                                <button type="button" class="filter-dropdown__option" role="menuitem">Any price</button>
-                                <button type="button" class="filter-dropdown__option" role="menuitem">₱ Budget</button>
-                                <button type="button" class="filter-dropdown__option" role="menuitem">₱₱ Mid-range</button>
-                                <button type="button" class="filter-dropdown__option" role="menuitem">₱₱₱ Premium</button>
+
+                            <div class="filter-dropdown__panel" hidden>
+                                <button type="button" class="filter-dropdown__option">Any price</button>
+                                <button type="button" class="filter-dropdown__option">₱ Budget</button>
+                                <button type="button" class="filter-dropdown__option">₱₱ Mid-range</button>
+                                <button type="button" class="filter-dropdown__option">₱₱₱ Premium</button>
                             </div>
                         </div>
+
                         <div class="filter-dropdown">
-                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger" id="filterMoreTrigger" aria-expanded="false" aria-haspopup="true" aria-controls="filterMorePanel">
-                                More Filters <span class="filter-chevron" aria-hidden="true"></span>
+                            <button type="button" class="filter-btn white-btn filter-dropdown__trigger">
+                                More Filters <span class="filter-chevron"></span>
                             </button>
-                            <div id="filterMorePanel" class="filter-dropdown__panel filter-dropdown__panel--wide" role="menu" hidden>
+
+                            <div class="filter-dropdown__panel filter-dropdown__panel--wide" hidden>
                                 <p class="filter-dropdown__hint">Quick options (demo)</p>
-                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-deals"> Deals &amp; offers</label>
-                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-new"> New on foodpanda</label>
-                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-halal"> Halal</label>
-                                <label class="filter-dropdown__check"><input type="checkbox" name="mf-voucher"> Accepts vouchers</label>
+                                <label class="filter-dropdown__check"><input type="checkbox"> Deals & offers</label>
+                                <label class="filter-dropdown__check"><input type="checkbox"> New on foodpanda</label>
+                                <label class="filter-dropdown__check"><input type="checkbox"> Halal</label>
+                                <label class="filter-dropdown__check"><input type="checkbox"> Accepts vouchers</label>
                                 <button type="button" class="filter-dropdown__apply">Apply</button>
                             </div>
                         </div>
@@ -109,22 +123,37 @@
                 <div class="hero-image">
                     <img src="assets/logos/food delivery hero.png" alt="Food delivery hero">
                 </div>
+
                 <div class="hero-image-buttons">
-                    <button type="button" class="filter-btn toggle-btn primary-tint filter-control" data-filter="free-delivery"><span class="icon">🚚</span> Free Delivery</button>
-                    <button type="button" class="filter-btn toggle-btn primary-gradient text-white filter-control" data-filter="top-offers"><span class="icon">🎟️</span> Top Offers</button>
+                    <button type="button" class="filter-btn toggle-btn primary-tint filter-control" data-filter="free-delivery">
+                        <span class="icon">🚚</span> Free Delivery
+                    </button>
+
+                    <button type="button" class="filter-btn toggle-btn primary-gradient text-white filter-control" data-filter="top-offers">
+                        <span class="icon">🎟️</span> Top Offers
+                    </button>
                 </div>
             </section>
 
             <section class="restaurants-section">
-                <div class="restaurant-card" data-name="Mang Inasal - Iriga City" data-tags="Fast Food Chicken Free Delivery Top Offers" data-rating="4.9" tabindex="0" role="button" aria-label="Open Mang Inasal details" onclick="window.location.href='/checkout'">
+                <div class="restaurant-card"
+                    data-name="Mang Inasal - Iriga City"
+                    data-tags="Fast Food Chicken Free Delivery Top Offers"
+                    data-rating="4.9"
+                    data-lat="13.4075"
+                    data-lng="123.3720"
+                    onclick="window.location.href='/checkout?restaurant=mang-inasal'">
+
                     <div class="img-container">
-                        <img src="images/rest_mang_inasal.png" alt="Mang Inasal">
+                        <img src="assets/food/Manginasal.jpg" alt="Mang Inasal">
                     </div>
+
                     <div class="rest-info">
                         <h3>Mang Inasal - Iriga City</h3>
                         <div class="rating-row">
-                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
-                                class="muted">10000+</span>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="score">4.9</span>
+                            <span class="muted">10000+</span>
                         </div>
                         <div class="bottom-row">
                             <span class="tags">Fast Food</span>
@@ -133,15 +162,24 @@
                     </div>
                 </div>
 
-                <div class="restaurant-card" data-name="Jollibee - Iriga City" data-tags="Fast Food Burger Free Delivery" data-rating="4.9" tabindex="0" role="button" aria-label="Open Jollibee details" onclick="window.location.href='/checkout'">
+                <div class="restaurant-card"
+                    data-name="Jollibee - Iriga City"
+                    data-tags="Fast Food Burger Free Delivery"
+                    data-rating="4.9"
+                    data-lat="13.4080"
+                    data-lng="123.3735"
+                    onclick="window.location.href='/checkout?restaurant=jollibee'">
+
                     <div class="img-container">
-                        <img src="images/rest_jollibee.png" alt="Jollibee">
+                        <img src="assets/food/Jollibee.jpg" alt="Jollibee">
                     </div>
+
                     <div class="rest-info">
                         <h3>Jollibee - Iriga City</h3>
                         <div class="rating-row">
-                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
-                                class="muted">10000+</span>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="score">4.9</span>
+                            <span class="muted">10000+</span>
                         </div>
                         <div class="bottom-row">
                             <span class="tags">Fast Food</span>
@@ -150,15 +188,24 @@
                     </div>
                 </div>
 
-                <div class="restaurant-card" data-name="Mcdo - Iriga City" data-tags="Fast Food Burger Top Offers" data-rating="4.9" tabindex="0" role="button" aria-label="Open Mcdo details" onclick="window.location.href='/checkout'">
+                <div class="restaurant-card"
+                    data-name="Mcdo - Iriga City"
+                    data-tags="Fast Food Burger Top Offers"
+                    data-rating="4.9"
+                    data-lat="13.4065"
+                    data-lng="123.3715"
+                    onclick="window.location.href='/checkout?restaurant=mcdo'">
+
                     <div class="img-container">
-                        <img src="images/rest_mcdo.png" alt="Mcdo">
+                        <img src="assets/food/Mcdo.webp" alt="Mcdo">
                     </div>
+
                     <div class="rest-info">
                         <h3>Mcdo - Iriga City</h3>
                         <div class="rating-row">
-                            <span class="stars">⭐⭐⭐⭐⭐</span> <span class="score">4.9</span> <span
-                                class="muted">10000+</span>
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="score">4.9</span>
+                            <span class="muted">10000+</span>
                         </div>
                         <div class="bottom-row">
                             <span class="tags">Fast Food</span>
@@ -168,11 +215,10 @@
                 </div>
             </section>
 
-            <p id="emptyState" class="empty-state" hidden>No restaurants match your current search/filter. Try another keyword.</p>
-
+            <p id="emptyState" class="empty-state" hidden>No nearby restaurants match your current location/search.</p>
         </div>
 
-        <a href="#" class="chat-support" aria-label="24/7 Chat Support">
+        <a href="#" class="chat-support">
             <div class="support-img-wrapper">
                 <img src="assets/logos/support.png" alt="">
             </div>
@@ -180,32 +226,155 @@
         </a>
     </div>
 
-    <div id="locationModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="locationAddrLabel" hidden>
-        <div class="location-modal__panel">
-            <button type="button" class="location-modal__close" id="locationModalClose" aria-label="Close dialog">&times;</button>
-            <label id="locationAddrLabel" class="location-modal__label" for="locationAddressInput">Enter your address</label>
-            <div class="location-modal__row">
-                <div class="location-modal__field">
-                    <input id="locationAddressInput" type="text" class="location-modal__input" placeholder="Street, Postal Code" autocomplete="street-address">
-                    <button type="button" class="location-modal__locate" id="locationLocateMe">
-                        <svg class="location-modal__locate-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-                        Locate me
-                    </button>
-                </div>
-                <button type="button" class="location-modal__arrow" id="locationSubmitAddress" aria-label="Use this address">→</button>
+    <!-- LOCATION MODAL WITH LIVE MAP -->
+    <div id="locationModal" class="location-modal" hidden>
+        <div class="location-map-panel">
+            <button type="button" class="location-map-close" id="locationModalClose">x</button>
+
+            <h2>Set Your Delivery Location</h2>
+
+            <div class="location-map-input">
+                <span>⌕</span>
+                <input id="locationAddressInput" type="text" placeholder="Enter your delivery address">
             </div>
-            <h3 class="location-modal__section-title">Popular locations</h3>
-            <div class="location-modal__pills">
-                <button type="button" class="location-modal__pill" data-location="Quezon City">Quezon City</button>
-                <button type="button" class="location-modal__pill" data-location="Manila">Manila</button>
-                <button type="button" class="location-modal__pill" data-location="Cebu City">Cebu City</button>
-                <button type="button" class="location-modal__pill" data-location="Calamba">Calamba</button>
-                <button type="button" class="location-modal__pill" data-location="San Pedro Laguna">San Pedro Laguna</button>
+
+            <div class="location-map-selected">
+                <span>📍</span>
+                <p id="selectedLocationText">Click the map to pin your location</p>
             </div>
-            <a href="#" class="location-modal__login-link" id="locationLoginLink">Log in to save address</a>
+
+            <div id="liveMap" class="location-map-box"></div>
+
+            <div class="location-map-caption" id="locationCaption">
+                No location selected yet
+            </div>
+
+            <button type="button" class="location-map-confirm" id="locationSubmitAddress">
+                Confirm
+            </button>
         </div>
     </div>
+
     <script src="app.js"></script>
+
+    <script>
+        let map;
+        let marker;
+        let pinnedLat = null;
+        let pinnedLng = null;
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) *
+                Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+
+        function filterNearbyRestaurants(userLat, userLng) {
+            const cards = document.querySelectorAll(".restaurant-card");
+            let visible = 0;
+
+            cards.forEach(card => {
+                const rLat = parseFloat(card.dataset.lat);
+                const rLng = parseFloat(card.dataset.lng);
+
+                if (Number.isNaN(rLat) || Number.isNaN(rLng)) {
+                    card.hidden = false;
+                    visible++;
+                    return;
+                }
+
+                const distance = getDistance(userLat, userLng, rLat, rLng);
+
+                if (distance <= 2) {
+                    card.hidden = false;
+                    visible++;
+                } else {
+                    card.hidden = true;
+                }
+            });
+
+            document.getElementById("emptyState").hidden = visible > 0;
+        }
+
+        function initLiveMap() {
+            if (map) return;
+
+            map = L.map("liveMap").setView([13.4073, 123.3724], 15);
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap"
+            }).addTo(map);
+
+            map.on("click", async function (e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                pinnedLat = lat;
+                pinnedLng = lng;
+
+                filterNearbyRestaurants(lat, lng);
+
+                if (marker) {
+                    marker.setLatLng([lat, lng]);
+                } else {
+                    marker = L.marker([lat, lng]).addTo(map);
+                }
+
+                const input = document.getElementById("locationAddressInput");
+                const display = document.getElementById("selectedLocationText");
+                const caption = document.getElementById("locationCaption");
+
+                try {
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+                    );
+
+                    const data = await response.json();
+                    const address = data.display_name || `${lat}, ${lng}`;
+
+                    input.value = address;
+                    display.textContent = address;
+                    caption.textContent = address;
+                } catch {
+                    const coords = `${lat}, ${lng}`;
+
+                    input.value = coords;
+                    display.textContent = coords;
+                    caption.textContent = coords;
+                }
+            });
+        }
+
+        document.getElementById("locationChangeBtn").addEventListener("click", () => {
+            setTimeout(() => {
+                initLiveMap();
+                map.invalidateSize();
+            }, 200);
+        });
+
+        document.getElementById("locationSubmitAddress").addEventListener("click", () => {
+            const value = document.getElementById("locationAddressInput").value.trim();
+
+            if (value) {
+                document.getElementById("locationDisplay").textContent = value;
+            }
+
+            if (pinnedLat !== null && pinnedLng !== null) {
+                filterNearbyRestaurants(pinnedLat, pinnedLng);
+            }
+
+            document.getElementById("locationModal").hidden = true;
+            document.body.style.overflow = "";
+        });
+    </script>
 </body>
 
 </html>

@@ -3,151 +3,438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodpanda Redesign - Checkout</title>
+    <title>Restaurant Menu</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <div class="window-frame">
-        <div class="app-container">
-            <header class="header">
-                <div class="header-logo" onclick="window.location.href='/'">
-                    <img src="assets/logos/foodpanda icon.png" alt="Foodpanda logo"
-                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
-                    <span>foodpanda</span>
-                </div>
-                <button type="button" id="checkoutHeaderLocation" class="location-pill center-pill checkout-location-btn" aria-label="Delivery area: Iriga City, Camarines Sur. Change location">
-                    <span class="icon text-primary">📍</span>
-                    <span class="checkout-location-text">Iriga City, Camarines Sur</span>
-                    <span class="header-menu-chev" aria-hidden="true"></span>
-                </button>
-                <div class="header-auth">
-                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Carl Gerald" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Carl Gerald <span class="header-menu-chev" aria-hidden="true"></span></div>
-                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> ENG</div>
-                    <div class="nav-item cart-icon header-menu-trigger" data-header-menu="cart" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
-                </div>
-            </header>
+<div class="menu-page">
+    <div class="menu-shell">
 
-            <div class="checkout-header">
-                <h2>Review and place your order</h2>
-                <div class="stepper">
-                    <div class="step active"><div class="circle">1</div> Delivery Details</div>
-                    <div class="line"></div>
-                    <div class="step"><div class="circle">2</div> Payment</div>
-                    <div class="line"></div>
-                    <div class="step"><div class="circle">3</div> Review</div>
-                </div>
+        <header class="menu-topbar">
+            <div class="header-logo" onclick="window.location.href='/'">
+                <img src="assets/logos/pandabites.png" alt="foodpanda">
             </div>
 
-            <div class="checkout-grid">
-                <div class="checkout-main">
-                    <div class="card-box">
-                        <h3>Delivery Details</h3>
-                        <div class="section-title">Delivery Address <a href="#" class="edit-text" id="deliveryAddressChange">Change</a></div>
-                        <div class="address-card">
-                            <div class="map-thumb" style="background-color: #f0f0f0; width: 120px; height: 80px; border-radius: 8px;"></div>
-                            <div class="address-info">
-                                <h4><span class="icon text-primary">📍</span> Camarines Sur Polytechnic Colleges</h4>
-                                <p class="text-muted">4434, National Rd, Nabua, Camarines Sur</p>
-                                <input type="text" placeholder="Note to rider e.g building, landmark" class="note-input">
-                            </div>
-                            <a href="#" class="edit-link" id="deliveryAddressEdit">Edit</a>
-                        </div>
-                        <div class="toggle-row">
-                            <span class="text-sm">Contactless Delivery</span>
-                            <div class="toggle-switch active"><div class="knob"></div></div>
-                        </div>
-                        <div class="section-title mt-4">Delivery Options</div>
-                        <div class="options-grid">
-                            <div class="option-btn active"><div class="radio selected"></div> Standard (5-20 minutes)</div>
-                            <div class="option-btn bg-pink-light"><div class="radio"></div> Priority (5-15 minutes)</div>
-                            <div class="option-btn bg-pink-light"><div class="radio"></div> Scheduled <span class="icon text-primary ml-auto">📅</span></div>
-                        </div>
+            <div class="menu-location-pill" id="locationBtn">
+                <span>📍</span>
+                <span>Iriga City, Camarines Sur</span>
+                <span>⌄</span>
+            </div>
+
+            <div class="menu-icons">
+                <span id="accountBtn">👤 Ann⌄</span>
+                <span id="languageBtn">🌐 EN⌄</span>
+                <span id="favoriteBtn">♡</span>
+                <span id="cartIcon">🛒</span>
+                <span>🐼</span>
+            </div>
+        </header>
+
+        <main class="restaurant-menu-layout">
+            <section class="restaurant-menu-main">
+
+                <div class="restaurant-menu-banner">
+                    <img class="menu-rest-logo" src="" alt="Restaurant logo">
+
+                    <div class="menu-rest-info">
+                        <p id="breadcrumb">Iriga Camarines Sur &gt; Restaurant List</p>
+                        <span id="restaurantCategory"></span>
+                        <h1 id="restaurantName"></h1>
+                        <small>🛵 ₱99 delivery or ₱99 with Saver · Min. order ₱109</small>
+                        <p class="menu-stars">★★★★★ <span>4.9 10000+</span></p>
                     </div>
 
-                    <div class="card-box">
-                        <h3>Personal Details</h3>
-                        <div class="personal-card">
-                            <div class="info">
-                                <h4 id="checkoutDisplayName">Carl Gerald Parro</h4>
-                                <p id="checkoutDisplayEmail" class="text-muted">carlgeraldparro@gmail.com</p>
-                                <p id="checkoutDisplayPhone" class="text-muted">09625728203</p>
-                            </div>
-                            <a href="#" class="edit-link" id="personalDetailsOpen">Edit</a>
-                        </div>
-                    </div>
-
-                    <div class="card-box">
-                        <h3>Payment</h3>
-                        <div class="payment-grid">
-                            <div class="option-btn bg-pink-light"><div class="radio"></div> Cash on Delivery</div>
-                            <div class="option-btn bg-pink-light"><div class="radio"></div> Link Bank Account <div class="bank-icons">🏦</div></div>
-                            <div class="option-btn active"><div class="radio selected"></div> e-wallet <span class="ewallet-icon" aria-hidden="true">📱</span></div>
-                            <div class="option-btn bg-pink-light"><div class="radio"></div> Credit or Debit Card <span class="cards-icon">💳</span></div>
-                        </div>
-                    </div>
+                    <img class="menu-hero-food" src="" alt="Restaurant food">
                 </div>
 
-                <div class="checkout-sidebar">
-                    <div class="card-box order-summary">
-                        <h3>Your Order</h3>
-                        <div class="restaurant-title">
-                            <div class="rest-logo-small"></div>
-                            <span><strong>Mang Inasal</strong> - Iriga City</span>
-                        </div>
-                        <div class="order-items">
-                            <div class="item">
-                                <div class="item-qty">3 ✕</div>
-                                <div class="item-desc">
-                                    <strong>Pecho Large - PM2</strong>
-                                    <div class="food-thumb-small"></div>
-                                </div>
-                                <div class="item-price">₱ 561</div>
-                            </div>
-                            <hr class="divider">
-                            <div class="item">
-                                <div class="item-qty">1 ✕</div>
-                                <div class="item-desc">
-                                    <strong>Paa Large - PM1</strong>
-                                    <div class="food-thumb-small"></div>
-                                </div>
-                                <div class="item-price">₱ 157</div>
-                            </div>
-                        </div>
-                        <a href="#" class="add-more">+ Add more items</a>
-                        <div class="totals pt-4 mt-4">
-                            <div class="row text-sm"><span class="text-muted">Subtotal</span><span class="text-muted">₱718</span></div>
-                            <div class="row text-sm"><span class="text-muted">Standard delivery Free</span><span class="text-muted">Free</span></div>
-                            <div class="row text-sm"><span class="text-muted">Service Fee</span><span class="text-muted">₱5</span></div>
-                            <div class="row total-row mt-2"><strong>Total</strong> <small class="text-muted font-normal">(incl. fees and tax)</small> <strong>₱ 723</strong></div>
-                        </div>
-                        <button class="primary-btn checkout-btn full-width mt-4" onclick="window.location.href='/tracking'">Place Order ₱ 723</button>
-                    </div>
+                <div class="menu-category-row">
+                    <input id="menuSearch" type="text" placeholder="🔍 Search in menu">
+                    <button class="active" data-category="Popular">Popular</button>
+                    <button data-category="Meals">Meals</button>
+                    <button data-category="Chicken">Chicken</button>
+                    <button data-category="Burger">Burger</button>
+                    <button data-category="Drinks">Drinks</button>
+                    <button data-category="Dessert">Dessert</button>
                 </div>
-            </div>
 
-        </div>
+                <section class="menu-food-section">
+                    <h2 id="sectionTitle">🔥 Popular</h2>
+                    <p>Most ordered right now</p>
+                    <div class="menu-food-grid" id="foodGrid"></div>
+                </section>
 
-        <div id="personalDetailsModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="personalDetailsTitle" hidden>
-            <div class="location-modal__panel">
-                <button type="button" class="location-modal__close" id="personalDetailsModalClose" aria-label="Close">&times;</button>
-                <h2 id="personalDetailsTitle" class="main-heading" style="font-size: 22px; margin-bottom: 16px;">Edit personal details</h2>
-                <label class="location-modal__label" for="pdFullName">Full name</label>
-                <input id="pdFullName" type="text" class="note-input" style="width: 100%; margin-bottom: 14px;" autocomplete="name">
-                <label class="location-modal__label" for="pdEmail">Email</label>
-                <input id="pdEmail" type="email" class="note-input" style="width: 100%; margin-bottom: 14px;" autocomplete="email">
-                <label class="location-modal__label" for="pdPhone">Mobile number</label>
-                <input id="pdPhone" type="tel" class="note-input" style="width: 100%; margin-bottom: 20px;" autocomplete="tel">
-                <button type="button" class="primary-btn full-width" id="personalDetailsSave">Save changes</button>
-            </div>
-        </div>
+            </section>
 
-        <a href="#" class="chat-support" aria-label="24/7 Chat Support">
-            <div class="support-img-wrapper">
-                <img src="assets/logos/support.png" alt="">
-            </div>
-            <div class="chat-badge">24/7 Chat Support</div>
-        </a>
+            <aside class="menu-cart">
+                <div class="menu-cart-tabs">
+                    <button class="active" id="deliveryTab">Delivery</button>
+                    <button id="pickupTab">Pick-up</button>
+                </div>
+
+                <div class="menu-empty-cart" id="cartContent">
+                    <img src="assets/logos/cart-panda.png" alt="Panda cart"
+                         onerror="this.src='assets/logos/support.png'">
+                    <h3>Hungry?</h3>
+                    <p>You haven't added anything<br>in your cart</p>
+                </div>
+
+                <div class="menu-cart-bottom">
+                    <div class="menu-total">
+                        <strong>Total <small>(incl. fees and tax)</small></strong>
+                        <strong id="cartTotal">₱ 0</strong>
+                    </div>
+                    <a href="#" id="summaryBtn">See summary</a>
+                    <button id="reviewBtn">Review Payment and Address</button>
+                </div>
+            </aside>
+        </main>
     </div>
-    <script src="app.js"></script>
+</div>
+
+<!-- FOOD MODAL -->
+<div id="foodModal" class="food-modal" hidden>
+    <div class="food-modal-card">
+        <button class="food-modal-close" id="foodModalClose" type="button">×</button>
+
+        <img id="modalFoodImg" class="food-modal-img" src="" alt="Food">
+
+        <div class="food-modal-content">
+            <h2 id="modalFoodName">Food Name</h2>
+            <p id="modalFoodPrice" class="food-modal-price">₱0</p>
+            <p id="modalFoodDesc">Food description</p>
+
+            <hr>
+
+            <div class="option-box">
+                <div class="option-title">
+                    <div>
+                        <h3>Variation</h3>
+                        <p>Select 1</p>
+                    </div>
+                    <span>Required</span>
+                </div>
+
+                <label class="option-row">
+                    <input type="radio" name="variation" value="Solo" data-price="0" checked>
+                    <span>Solo</span>
+                    <strong id="soloPrice">₱0</strong>
+                </label>
+
+                <label class="option-row">
+                    <input type="radio" name="variation" value="With Drink" data-price="30">
+                    <span>With Drink</span>
+                    <strong id="drinkPrice">₱0</strong>
+                </label>
+
+                <label class="option-row">
+                    <input type="radio" name="variation" value="Busog Upgrade" data-price="49">
+                    <span>Busog Upgrade <small>1 Small Drink, 1 Plain Rice, 1 Extra Chicken Oil & Toyomansi</small></span>
+                    <strong id="upgradePrice">₱0</strong>
+                </label>
+            </div>
+
+            <div class="addons-box">
+                <h3>Frequently bought together</h3>
+                <p>Other consumers also ordered these</p>
+
+                <label class="addon-row">
+                    <span>🌄 Chicken Oil</span>
+                    <strong>+ ₱7</strong>
+                    <input type="checkbox" data-price="7">
+                </label>
+
+                <label class="addon-row">
+                    <span>🌄 Soup</span>
+                    <strong>+ ₱12</strong>
+                    <input type="checkbox" data-price="12">
+                </label>
+
+                <label class="addon-row">
+                    <span>🌄 Toyomansi</span>
+                    <strong>+ ₱7</strong>
+                    <input type="checkbox" data-price="7">
+                </label>
+            </div>
+
+            <div class="modal-bottom">
+                <div class="qty-control">
+                    <button id="qtyMinus" type="button">-</button>
+                    <span id="modalQty">1</span>
+                    <button id="qtyPlus" type="button">+</button>
+                </div>
+
+                <button id="modalAddCart" type="button">Add to cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const restaurantData = {
+    "mang-inasal": {
+        name: "Mang Inasal - Iriga City",
+        category: "Desserts · Meat · BBQ · Chicken",
+        logo: "assets/manglogo.svg",
+        hero: "assets/food/pm2.webp",
+        items: [
+            { name: "Paa Large - PM1", price: 157, img: "images/paa-large.png", category: "Popular" },
+            { name: "Pecho Large - PM2", price: 187, img: "images/pecho-large.png", category: "Chicken" },
+            { name: "Pork BBQ Meal", price: 145, img: "images/paa-large.png", category: "Meals" },
+            { name: "Halo-Halo", price: 89, img: "images/pecho-large.png", category: "Dessert" }
+        ]
+    },
+    "jollibee": {
+        name: "Jollibee - Iriga City",
+        category: "Fast Food · Chicken · Burger · Spaghetti",
+        logo: "images/jollibee-logo.png",
+        hero: "images/jollibee-food.png",
+        items: [
+            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "images/chickenjoy.png", category: "Popular" },
+            { name: "Jolly Spaghetti", price: 75, img: "images/spaghetti.png", category: "Meals" },
+            { name: "Yumburger", price: 55, img: "images/chickenjoy.png", category: "Burger" },
+            { name: "Peach Mango Pie", price: 48, img: "images/spaghetti.png", category: "Dessert" }
+        ]
+    },
+    "mcdo": {
+        name: "Mcdo - Iriga City",
+        category: "Fast Food · Burgers · Fries · Drinks",
+        logo: "images/mcdo-logo.png",
+        hero: "images/mcdo-food.png",
+        items: [
+            { name: "Burger McDo Meal", price: 115, img: "assets/food/chicken1.webp", category: "Popular" },
+            { name: "McChicken Meal", price: 155, img: "images/mcchicken.png", category: "Chicken" },
+            { name: "Fries Large", price: 92, img: "images/burger-mcdo.png", category: "Meals" },
+            { name: "Coke Float", price: 65, img: "images/mcchicken.png", category: "Drinks" }
+        ]
+    }
+};
+
+const params = new URLSearchParams(window.location.search);
+const restaurantKey = params.get("restaurant") || "mang-inasal";
+const restaurant = restaurantData[restaurantKey] || restaurantData["mang-inasal"];
+
+let cart = [];
+let currentCategory = "Popular";
+let selectedFood = null;
+let modalQty = 1;
+
+const restaurantName = document.getElementById("restaurantName");
+const restaurantCategory = document.getElementById("restaurantCategory");
+const breadcrumb = document.getElementById("breadcrumb");
+const logo = document.querySelector(".menu-rest-logo");
+const hero = document.querySelector(".menu-hero-food");
+const foodGrid = document.getElementById("foodGrid");
+const cartContent = document.getElementById("cartContent");
+const cartTotal = document.getElementById("cartTotal");
+const cartIcon = document.getElementById("cartIcon");
+const sectionTitle = document.getElementById("sectionTitle");
+const searchInput = document.getElementById("menuSearch");
+
+restaurantName.textContent = restaurant.name;
+restaurantCategory.textContent = restaurant.category;
+breadcrumb.textContent = "Iriga Camarines Sur > Restaurant List > " + restaurant.name;
+logo.src = restaurant.logo;
+logo.alt = restaurant.name;
+hero.src = restaurant.hero;
+hero.alt = restaurant.name;
+
+function renderMenu() {
+    const keyword = searchInput.value.toLowerCase();
+
+    const filteredItems = restaurant.items.filter(item => {
+        const matchesCategory = currentCategory === "Popular" || item.category === currentCategory;
+        const matchesSearch = item.name.toLowerCase().includes(keyword);
+        return matchesCategory && matchesSearch;
+    });
+
+    foodGrid.innerHTML = "";
+
+    if (filteredItems.length === 0) {
+        foodGrid.innerHTML = "<p>No menu items found.</p>";
+        return;
+    }
+
+    filteredItems.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "menu-food-card";
+
+        card.innerHTML = `
+            <div>
+                <h3>${item.name}</h3>
+                <strong>from ₱${item.price}</strong>
+                <p>${item.name} meal</p>
+            </div>
+            <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
+            <button type="button">+</button>
+        `;
+
+        card.addEventListener("click", () => openFoodModal(item));
+
+        card.querySelector("button").addEventListener("click", (event) => {
+            event.stopPropagation();
+            openFoodModal(item);
+        });
+
+        foodGrid.appendChild(card);
+    });
+}
+
+function openFoodModal(item) {
+    selectedFood = item;
+    modalQty = 1;
+
+    document.getElementById("modalFoodName").textContent = item.name;
+    document.getElementById("modalFoodPrice").textContent = "₱" + item.price;
+    document.getElementById("modalFoodDesc").textContent = item.name + " meal";
+    document.getElementById("modalFoodImg").src = item.img;
+    
+
+    document.getElementById("soloPrice").textContent = "₱" + item.price;
+    document.getElementById("drinkPrice").textContent = "₱" + (item.price + 30);
+    document.getElementById("upgradePrice").textContent = "₱" + (item.price + 49);
+
+    document.querySelector("input[name='variation'][value='Solo']").checked = true;
+    document.querySelectorAll(".addon-row input").forEach(input => input.checked = false);
+    document.getElementById("modalQty").textContent = modalQty;
+
+    document.getElementById("foodModal").hidden = false;
+}
+
+document.getElementById("foodModalClose").addEventListener("click", () => {
+    document.getElementById("foodModal").hidden = true;
+});
+
+document.getElementById("foodModal").addEventListener("click", (event) => {
+    if (event.target.id === "foodModal") {
+        document.getElementById("foodModal").hidden = true;
+    }
+});
+
+document.getElementById("qtyMinus").addEventListener("click", () => {
+    if (modalQty > 1) {
+        modalQty--;
+        document.getElementById("modalQty").textContent = modalQty;
+    }
+});
+
+document.getElementById("qtyPlus").addEventListener("click", () => {
+    modalQty++;
+    document.getElementById("modalQty").textContent = modalQty;
+});
+
+document.getElementById("modalAddCart").addEventListener("click", () => {
+    if (!selectedFood) return;
+
+    const variation = document.querySelector("input[name='variation']:checked");
+    const variationName = variation.value;
+    const variationAdd = Number(variation.dataset.price || 0);
+
+    let addonTotal = 0;
+    const addonNames = [];
+
+    document.querySelectorAll(".addon-row input:checked").forEach(addon => {
+        addonTotal += Number(addon.dataset.price || 0);
+        addonNames.push(addon.closest(".addon-row").querySelector("span").textContent.trim());
+    });
+
+    const finalPrice = (selectedFood.price + variationAdd + addonTotal) * modalQty;
+
+    cart.push({
+        name: `${selectedFood.name} (${variationName})`,
+        price: finalPrice,
+        qty: modalQty,
+        addons: addonNames
+    });
+
+    updateCart();
+    document.getElementById("foodModal").hidden = true;
+});
+
+function updateCart() {
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+    cartTotal.textContent = "₱ " + total;
+    cartIcon.textContent = "🛒 " + cart.length;
+
+    if (cart.length === 0) {
+        cartContent.innerHTML = `
+            <img src="assets/logos/cart-panda.png" alt="Panda cart" onerror="this.src='assets/logos/support.png'">
+            <h3>Hungry?</h3>
+            <p>You haven't added anything<br>in your cart</p>
+        `;
+        return;
+    }
+
+    cartContent.innerHTML = `
+        <h3>Your Cart</h3>
+        <div class="cart-items-list">
+            ${cart.map(item => `
+                <p>
+                    ${item.qty}x ${item.name} - ₱${item.price}
+                    ${item.addons.length ? `<br><small>Add-ons: ${item.addons.join(", ")}</small>` : ""}
+                </p>
+            `).join("")}
+        </div>
+    `;
+}
+
+document.querySelectorAll(".menu-category-row button").forEach(button => {
+    button.addEventListener("click", () => {
+        document.querySelectorAll(".menu-category-row button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        currentCategory = button.dataset.category;
+        sectionTitle.textContent = currentCategory === "Popular" ? "🔥 Popular" : currentCategory;
+
+        renderMenu();
+    });
+});
+
+searchInput.addEventListener("input", renderMenu);
+
+document.getElementById("deliveryTab").addEventListener("click", () => {
+    document.getElementById("deliveryTab").classList.add("active");
+    document.getElementById("pickupTab").classList.remove("active");
+});
+
+document.getElementById("pickupTab").addEventListener("click", () => {
+    document.getElementById("pickupTab").classList.add("active");
+    document.getElementById("deliveryTab").classList.remove("active");
+});
+
+document.getElementById("locationBtn").addEventListener("click", () => {
+    alert("Change location feature is for prototype only.");
+});
+
+document.getElementById("accountBtn").addEventListener("click", () => {
+    alert("Account menu is for prototype only.");
+});
+
+document.getElementById("languageBtn").addEventListener("click", () => {
+    alert("Language menu is for prototype only.");
+});
+
+document.getElementById("favoriteBtn").addEventListener("click", () => {
+    alert("Favorites feature is for prototype only.");
+});
+
+document.getElementById("summaryBtn").addEventListener("click", (event) => {
+    event.preventDefault();
+    alert("Cart summary feature is for prototype only.");
+});
+
+document.getElementById("reviewBtn").addEventListener("click", () => {
+    if (cart.length === 0) {
+        alert("Please add an item to your cart first.");
+        return;
+    }
+
+    window.location.href = "/review";
+});
+
+renderMenu();
+</script>
+
 </body>
 </html>
