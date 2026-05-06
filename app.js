@@ -418,7 +418,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
             btn.classList.add('active');
             btn.querySelector('.radio')?.classList.add('selected');
+
+            // Review page: show e-wallet provider picker only when e-wallet is selected.
+            const wrap = document.getElementById('ewalletProviderWrap');
+            if (wrap) {
+                const activePayment = document.querySelector('.payment-grid .option-btn.active');
+                const label = activePayment ? activePayment.textContent.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+                wrap.hidden = !label.includes('e-wallet');
+            }
         });
+    });
+
+    // Initial e-wallet provider visibility + restore last selection.
+    const ewalletWrap = document.getElementById('ewalletProviderWrap');
+    const ewalletInput = document.getElementById('ewalletProvider');
+    if (ewalletWrap) {
+        const activePayment = document.querySelector('.payment-grid .option-btn.active');
+        const label = activePayment ? activePayment.textContent.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+        ewalletWrap.hidden = !label.includes('e-wallet');
+    }
+    const setActiveEwalletChip = (value) => {
+        const chips = document.querySelectorAll('[data-ewallet-provider]');
+        chips.forEach(btn => {
+            const isActive = btn instanceof HTMLElement && btn.dataset.ewalletProvider === value;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+        });
+        if (ewalletInput) ewalletInput.value = value;
+    };
+
+    if (ewalletInput) {
+        try {
+            const saved = localStorage.getItem('ewalletProvider');
+            if (saved) setActiveEwalletChip(saved);
+            else setActiveEwalletChip(ewalletInput.value || 'GCash');
+        } catch (_e) {}
+    }
+
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const provider = target.dataset.ewalletProvider;
+        if (!provider) return;
+        setActiveEwalletChip(provider);
+        try { localStorage.setItem('ewalletProvider', provider); } catch (_e) {}
     });
 
     /* REVIEW PAGE ACTIONS */
@@ -704,9 +747,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activePayment = document.querySelector('.payment-grid .option-btn.active');
         const paymentMethod = activePayment ? activePayment.textContent.replace(/\s+/g, ' ').trim() : 'Selected method';
+        const ewalletProvider = document.getElementById('ewalletProvider')?.value;
+        const paymentLabel = paymentMethod.toLowerCase().includes('e-wallet') && ewalletProvider
+            ? `${paymentMethod} (${ewalletProvider})`
+            : paymentMethod;
 
         document.getElementById('confirmPayRestaurant').textContent = restaurantNameText;
-        document.getElementById('confirmPayMethod').textContent = paymentMethod;
+        document.getElementById('confirmPayMethod').textContent = paymentLabel;
         document.getElementById('confirmPayTotal').textContent = `₱ ${grandTotal}`;
         document.getElementById('confirmPaySubtotal').textContent = `₱${total}`;
         document.getElementById('confirmPayFee').textContent = serviceFee > 0 ? `₱${serviceFee}` : 'Free';
@@ -768,6 +815,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try { deliveryPin = JSON.parse(localStorage.getItem('deliveryPin') || 'null'); } catch { deliveryPin = null; }
         try { deliveryAddressText = localStorage.getItem('deliveryAddressText'); } catch { deliveryAddressText = null; }
 
+        const activePayment = document.querySelector('.payment-grid .option-btn.active');
+        const paymentMethod = activePayment ? activePayment.textContent.replace(/\s+/g, ' ').trim() : null;
+        const eWalletProvider = paymentMethod && paymentMethod.toLowerCase().includes('e-wallet')
+            ? (document.getElementById('ewalletProvider')?.value || null)
+            : null;
+
         const orderRecord = {
             id,
             status: 'ongoing',
@@ -779,7 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
             total: Number(currentReviewPayload.total || 0),
             serviceFee,
             deliveryPin,
-            deliveryAddressText
+            deliveryAddressText,
+            paymentMethod,
+            eWalletProvider
         };
 
         orders.unshift(orderRecord);
