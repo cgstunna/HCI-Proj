@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu</title>
+    <title>PandaBites</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -183,12 +183,12 @@ const restaurantData = {
         name: "Mang Inasal - Iriga City",
         category: "Desserts · Meat · BBQ · Chicken",
         logo: "assets/manglogo.svg",
-        hero: "assets/food/pm2.webp",
+        hero: "assets/food/pm2.png",
         items: [
-            { name: "Paa Large - PM1", price: 161, img: "assets/food/Paa Large - PM1.webp", category: "Popular", desc: "Paa Large with 1 rice" },
-            { name: "Pecho Large - PM2", price: 191, img: "assets/food/Pecho Large - PM2.webp", category: "Chicken", desc: "Pecho Large with 1 rice" },
-            { name: "Pork BBQ Meal", price: 145, img: "assets/food/Pork BBQ Meal.webp", category: "Meals", desc: "Pork BBQ meal with rice" },
-            { name: "Halo-Halo", price: 89, img: "assets/food/Halo - Halo.webp", category: "Dessert", desc: "Classic halo-halo dessert" }
+            { name: "Paa Large - PM1", price: 161, img: "assets/food/Paa Large - PM1.png", category: "Popular", desc: "Paa Large with 1 rice" },
+            { name: "Pecho Large - PM2", price: 191, img: "assets/food/Pecho Large - PM2.png", category: "Chicken", desc: "Pecho Large with 1 rice" },
+            { name: "Pork BBQ Meal", price: 145, img: "assets/food/Pork BBQ Meal.png", category: "Meals", desc: "Pork BBQ meal with rice" },
+            { name: "Halo-Halo", price: 89, img: "assets/food/Halo - Halo.png", category: "Dessert", desc: "Classic halo-halo dessert" }
         ]
     },
     "jollibee": {
@@ -197,10 +197,10 @@ const restaurantData = {
         logo: "assets/food/Jollibee logo.jpg",
         hero: "assets/food/Jollibee side photo food.png",
         items: [
-            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "assets/food/1-pc. Chickenjoy w Drink.webp", category: "Popular", desc: "Philippines' best-tasting crispylicious, juicylicious Chickenjoy that is crispy on the outside, tender and juicy on the inside." },
-            { name: "Jolly Spaghetti", price: 78, img: "assets/food/Jolly Spaghetti.webp", category: "Meals", desc: "Jolly Spaghetti Solo" },
-            { name: "Yumburger", price: 55, img: "assets/food/Yumburger.webp", category: "Burger", desc: "Yumburger meal" },
-            { name: "Peach Mango Pie", price: 53, img: "assets/food/Peach Mango Pie.webp", category: "Dessert", desc: "Golden brown, flaky, slightly sweet crust with a pleasant blend of diced peaches and mango filling in thick sauce" }
+            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "assets/food/1-pc. Chickenjoy w Drink.png", category: "Popular", desc: "Philippines' best-tasting crispylicious, juicylicious Chickenjoy that is crispy on the outside, tender and juicy on the inside." },
+            { name: "Jolly Spaghetti", price: 78, img: "assets/food/Jolly Spaghetti.png", category: "Meals", desc: "Jolly Spaghetti Solo" },
+            { name: "Yumburger", price: 55, img: "assets/food/Yumburger.png", category: "Burger", desc: "Yumburger meal" },
+            { name: "Peach Mango Pie", price: 53, img: "assets/food/Peach Mango Pie.png", category: "Dessert", desc: "Golden brown, flaky, slightly sweet crust with a pleasant blend of diced peaches and mango filling in thick sauce" }
         ]
     },
     "mcdo": {
@@ -209,10 +209,10 @@ const restaurantData = {
         logo: "assets/food/McDonalds logo.jpg",
         hero: "assets/food/McDonald side photo food.png",
         items: [
-            { name: "Burger McDo w/ Fries Small Meal", price: 126, img: "assets/food/Burger McDo w Fries Small Meal.webp", category: "Popular", desc: "Comes with Small Fries & Drink" },
-            { name: "1-pc. Chicken McDo Medium Meal", price: 116, img: "assets/food/1-pc. Chicken McDo Medium Meal.webp", category: "Chicken", desc: "Comes with a Drink" },
-            { name: "McShaker Fries Large Cheese", price: 124, img: "assets/food/McShaker Fries Large Cheese.webp", category: "Meals", desc: "" },
-            { name: "Coke McFloat Large", price: 80, img: "assets/food/Coke McFloat Large.webp", category: "Drinks", desc: "Drink only" }
+            { name: "Burger McDo w/ Fries Small Meal", price: 126, img: "assets/food/Burger McDo w Fries Small Meal.png", category: "Popular", desc: "Comes with Small Fries & Drink" },
+            { name: "1-pc. Chicken McDo Medium Meal", price: 116, img: "assets/food/1-pc. Chicken McDo Medium Meal.png", category: "Chicken", desc: "Comes with a Drink" },
+            { name: "McShaker Fries Large Cheese", price: 124, img: "assets/food/McShaker Fries Large Cheese.png", category: "Meals", desc: "" },
+            { name: "Coke McFloat Large", price: 80, img: "assets/food/Coke McFloat Large.png", category: "Drinks", desc: "Drink only" }
         ]
     }
 };
@@ -241,6 +241,29 @@ const cartTotal = document.getElementById("cartTotal");
 const cartIcon = document.getElementById("cartIcon");
 const sectionTitle = document.getElementById("sectionTitle");
 const searchInput = document.getElementById("menuSearch");
+
+function persistCheckoutState() {
+    const payload = {
+        restaurantKey,
+        restaurantName: restaurant.name,
+        restaurantLogo: restaurant.logo,
+        menuItems: restaurant.items,
+        items: cart,
+        total: cart.reduce((sum, item) => sum + item.price, 0)
+    };
+    try {
+        localStorage.setItem("checkoutCart", JSON.stringify(payload));
+    } catch (_error) {
+        // Ignore storage errors in strict browser modes.
+    }
+    try {
+        sessionStorage.setItem("checkoutCart", JSON.stringify(payload));
+    } catch (_error) {
+        // Ignore storage errors in strict browser modes.
+    }
+
+    return payload;
+}
 
 restaurantName.textContent = restaurant.name;
 restaurantCategory.textContent = restaurant.category;
@@ -768,6 +791,7 @@ document.getElementById("modalAddCart").addEventListener("click", () => {
         name: selectedFood.name,
         price: finalPrice,
         qty: modalQty,
+        img: selectedFood.img,
         addons: [...selectedChoices, ...addonNames],
         specialInstructions: document.getElementById("modalSpecialInstructions").value.trim(),
         unavailableAction: document.getElementById("modalUnavailableAction").value
@@ -803,6 +827,8 @@ function updateCart() {
             `).join("")}
         </div>
     `;
+
+    persistCheckoutState();
 }
 
 document.querySelectorAll(".menu-category-row button").forEach(button => {
@@ -926,6 +952,7 @@ document.getElementById("reviewBtn").addEventListener("click", () => {
         return;
     }
 
+    persistCheckoutState();
     window.location.href = "/review";
 });
 

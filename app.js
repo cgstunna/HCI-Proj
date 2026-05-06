@@ -142,32 +142,135 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationModal = document.getElementById('locationModal');
     const locationChangeBtn = document.getElementById('locationChangeBtn');
     const locationDisplay = document.getElementById('locationDisplay');
+    let locationMap = null;
+    let locationMarker = null;
+    let pinnedLat = null;
+    let pinnedLng = null;
+    let previewMap = null;
+    let previewMarker = null;
+
+    const ensurePreviewMap = () => {
+        const previewContainer = document.getElementById('deliveryAddressMap');
+        if (!previewContainer || !window.L || previewMap) return;
+
+        previewMap = window.L.map('deliveryAddressMap', {
+            zoomControl: false,
+            attributionControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+            touchZoom: false
+        }).setView([13.40755, 123.37466], 15);
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(previewMap);
+
+        previewMarker = window.L.marker([13.40755, 123.37466]).addTo(previewMap);
+    };
+
+    const setPreviewMapPin = (lat, lng) => {
+        ensurePreviewMap();
+        if (!previewMap || !previewMarker) return;
+        previewMap.setView([lat, lng], previewMap.getZoom());
+        previewMarker.setLatLng([lat, lng]);
+    };
+
+    const updatePinPreview = (lat, lng) => {
+        const shortLat = lat.toFixed(5);
+        const shortLng = lng.toFixed(5);
+        const selectedText = document.getElementById('selectedLocationText');
+        const caption = document.getElementById('locationCaption');
+        if (selectedText) selectedText.textContent = `Pinned at ${shortLat}, ${shortLng}`;
+        if (caption) caption.textContent = `Selected map point: ${shortLat}, ${shortLng}`;
+    };
+
+    const updateLocationDisplays = (titleText, subtitleText) => {
+        if (locationDisplay) locationDisplay.textContent = titleText;
+
+        const headerLocationText = document.querySelector('.checkout-location-text');
+        if (headerLocationText) headerLocationText.textContent = titleText;
+
+        const deliveryAddressTitle = document.getElementById('deliveryAddressTitle') || document.querySelector('.address-info h4');
+        if (deliveryAddressTitle) {
+            deliveryAddressTitle.innerHTML = `<span class="icon text-primary">📍</span> ${titleText}`;
+        }
+
+        const deliveryAddressLine = document.getElementById('deliveryAddressLine') || document.querySelector('.address-info p.text-muted');
+        if (deliveryAddressLine) deliveryAddressLine.textContent = subtitleText;
+    };
+
+    const openLocationModal = () => {
+        if (!locationModal) return;
+        locationModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+
+        const mapContainer = document.getElementById('liveMap');
+        if (!mapContainer || !window.L) return;
+
+        if (!locationMap) {
+            locationMap = window.L.map('liveMap').setView([13.4090, 123.3720], 15);
+            window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(locationMap);
+
+            locationMap.on('click', (event) => {
+                const { lat, lng } = event.latlng;
+                pinnedLat = lat;
+                pinnedLng = lng;
+
+                if (!locationMarker) {
+                    locationMarker = window.L.marker([lat, lng], { draggable: true }).addTo(locationMap);
+                    locationMarker.on('dragend', () => {
+                        const point = locationMarker.getLatLng();
+                        pinnedLat = point.lat;
+                        pinnedLng = point.lng;
+                        updatePinPreview(point.lat, point.lng);
+                    });
+                } else {
+                    locationMarker.setLatLng([lat, lng]);
+                }
+
+                updatePinPreview(lat, lng);
+                setPreviewMapPin(lat, lng);
+            });
+        }
+
+        setTimeout(() => locationMap?.invalidateSize(), 120);
+    };
+
+    const closeLocationModal = () => {
+        if (!locationModal) return;
+        locationModal.hidden = true;
+        document.body.style.overflow = '';
+    };
 
     locationChangeBtn?.addEventListener('click', e => {
         e.preventDefault();
-        if (locationModal) {
-            locationModal.hidden = false;
-            document.body.style.overflow = 'hidden';
-        }
+        openLocationModal();
     });
 
     document.getElementById('locationModalClose')?.addEventListener('click', () => {
-        locationModal.hidden = true;
-        document.body.style.overflow = '';
+        closeLocationModal();
     });
 
     locationModal?.addEventListener('click', e => {
         if (e.target === locationModal) {
-            locationModal.hidden = true;
-            document.body.style.overflow = '';
+            closeLocationModal();
         }
     });
 
     document.querySelectorAll('.location-modal__pill').forEach(pill => {
         pill.addEventListener('click', () => {
-            if (locationDisplay) locationDisplay.textContent = pill.dataset.location || pill.textContent.trim();
-            if (locationModal) locationModal.hidden = true;
-            document.body.style.overflow = '';
+            const selectedLocation = pill.dataset.location || pill.textContent.trim();
+            updateLocationDisplays(selectedLocation, 'Selected from quick locations');
+            if (pinnedLat !== null && pinnedLng !== null) {
+                setPreviewMapPin(pinnedLat, pinnedLng);
+            }
+            closeLocationModal();
         });
     });
 
@@ -179,14 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('locationAddressInput');
         const value = input?.value.trim();
 
-        if (!value) {
-            showToast('Please enter an address.');
+        if (value) {
+            updateLocationDisplays(value, 'Updated from typed delivery address');
+            closeLocationModal();
             return;
         }
 
-        if (locationDisplay) locationDisplay.textContent = value;
-        if (locationModal) locationModal.hidden = true;
-        document.body.style.overflow = '';
+        if (pinnedLat !== null && pinnedLng !== null) {
+            const pinText = `${pinnedLat.toFixed(5)}, ${pinnedLng.toFixed(5)}`;
+            updateLocationDisplays(`Pinned Location (${pinText})`, `Coordinates: ${pinText}`);
+            setPreviewMapPin(pinnedLat, pinnedLng);
+            closeLocationModal();
+            return;
+        }
+
+        showToast('Please enter an address or pin a location on the map.');
     });
 
     /* CHAT SUPPORT */
@@ -307,6 +417,289 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             btn.querySelector('.radio')?.classList.add('selected');
         });
+    });
+
+    /* REVIEW PAGE ACTIONS */
+
+    const personalDetailsModal = document.getElementById('personalDetailsModal');
+
+    const openPersonalDetailsModal = () => {
+        if (!personalDetailsModal) return;
+        const nameInput = document.getElementById('pdFullName');
+        const emailInput = document.getElementById('pdEmail');
+        const phoneInput = document.getElementById('pdPhone');
+
+        const displayName = document.getElementById('checkoutDisplayName')?.textContent?.trim() || '';
+        const displayEmail = document.getElementById('checkoutDisplayEmail')?.textContent?.trim() || '';
+        const displayPhone = document.getElementById('checkoutDisplayPhone')?.textContent?.trim() || '';
+
+        if (nameInput) nameInput.value = displayName;
+        if (emailInput) emailInput.value = displayEmail;
+        if (phoneInput) phoneInput.value = displayPhone;
+
+        personalDetailsModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closePersonalDetailsModal = () => {
+        if (!personalDetailsModal) return;
+        personalDetailsModal.hidden = true;
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('personalDetailsOpen')?.addEventListener('click', e => {
+        e.preventDefault();
+        openPersonalDetailsModal();
+    });
+
+    document.getElementById('personalDetailsModalClose')?.addEventListener('click', closePersonalDetailsModal);
+
+    personalDetailsModal?.addEventListener('click', e => {
+        if (e.target === personalDetailsModal) closePersonalDetailsModal();
+    });
+
+    document.getElementById('personalDetailsSave')?.addEventListener('click', () => {
+        const nameInput = document.getElementById('pdFullName');
+        const emailInput = document.getElementById('pdEmail');
+        const phoneInput = document.getElementById('pdPhone');
+
+        const name = nameInput?.value.trim();
+        const email = emailInput?.value.trim();
+        const phone = phoneInput?.value.trim();
+
+        if (name) document.getElementById('checkoutDisplayName').textContent = name;
+        if (email) document.getElementById('checkoutDisplayEmail').textContent = email;
+        if (phone) document.getElementById('checkoutDisplayPhone').textContent = phone;
+
+        closePersonalDetailsModal();
+        showToast('Personal details updated.');
+    });
+
+    document.getElementById('deliveryAddressChange')?.addEventListener('click', e => {
+        e.preventDefault();
+        if (locationModal) return openLocationModal();
+        showToast('Address change is unavailable on this page.');
+    });
+
+    document.getElementById('deliveryAddressEdit')?.addEventListener('click', e => {
+        e.preventDefault();
+        document.getElementById('deliveryAddressChange')?.click();
+    });
+
+    document.getElementById('checkoutHeaderLocation')?.addEventListener('click', e => {
+        e.preventDefault();
+        if (locationModal) return openLocationModal();
+        showToast('Location picker is unavailable on this page.');
+    });
+
+    document.querySelector('.order-summary .checkout-btn')?.addEventListener('click', () => {
+        showToast('Placing your order...');
+    });
+
+    ensurePreviewMap();
+
+    let currentReviewPayload = null;
+
+    const saveReviewPayload = (payload) => {
+        try {
+            localStorage.setItem('checkoutCart', JSON.stringify(payload));
+        } catch (_error) {}
+        try {
+            sessionStorage.setItem('checkoutCart', JSON.stringify(payload));
+        } catch (_error) {}
+    };
+
+    const renderReviewPayload = (payload) => {
+        const orderItemsContainer = document.getElementById('reviewOrderItems');
+        if (!orderItemsContainer) return;
+        orderItemsContainer.innerHTML = '';
+
+        const restaurantName = document.getElementById('reviewRestaurantName');
+        const restaurantLogo = document.getElementById('reviewRestaurantLogo');
+        if (!payload || !Array.isArray(payload.items) || !payload.items.length) {
+            if (restaurantName) restaurantName.innerHTML = '<strong>No active order</strong>';
+            if (orderItemsContainer) {
+                orderItemsContainer.innerHTML = '<p class="text-muted">No checkout data found. Please add items first.</p>';
+            }
+            const subtotalEl = document.getElementById('reviewSubtotal');
+            const serviceFeeEl = document.getElementById('reviewServiceFee');
+            const grandTotalEl = document.getElementById('reviewGrandTotal');
+            const placeOrderBtn = document.getElementById('reviewPlaceOrderBtn');
+            if (subtotalEl) subtotalEl.textContent = '₱0';
+            if (serviceFeeEl) serviceFeeEl.textContent = 'Free';
+            if (grandTotalEl) grandTotalEl.textContent = '₱ 0';
+            if (placeOrderBtn) placeOrderBtn.textContent = 'Place Order ₱ 0';
+            return;
+        }
+
+        if (restaurantName) restaurantName.innerHTML = `<strong>${payload.restaurantName || 'Restaurant'}</strong>`;
+        if (restaurantLogo && payload.restaurantLogo) restaurantLogo.src = payload.restaurantLogo;
+
+        orderItemsContainer.innerHTML = payload.items.map((item, index) => `
+            <div class="item">
+                <div class="item-qty">${item.qty} ✕</div>
+                <div class="item-desc">
+                    <strong>${item.name}</strong>
+                    ${item.img ? `<div class="food-thumb-small"><img src="${item.img}" alt="${item.name}"></div>` : ''}
+                    ${item.addons?.length ? `<div class="text-muted text-sm">${item.addons.join(', ')}</div>` : ''}
+                </div>
+                <div class="item-price">₱ ${item.price}</div>
+            </div>
+            ${index < payload.items.length - 1 ? '<hr class="divider">' : ''}
+        `).join('');
+
+        const subtotal = Number(payload.total || 0);
+        const serviceFee = subtotal > 0 ? 5 : 0;
+        const grandTotal = subtotal + serviceFee;
+
+        const subtotalEl = document.getElementById('reviewSubtotal');
+        const serviceFeeEl = document.getElementById('reviewServiceFee');
+        const grandTotalEl = document.getElementById('reviewGrandTotal');
+        const placeOrderBtn = document.getElementById('reviewPlaceOrderBtn');
+        if (subtotalEl) subtotalEl.textContent = `₱${subtotal}`;
+        if (serviceFeeEl) serviceFeeEl.textContent = serviceFee > 0 ? `₱${serviceFee}` : 'Free';
+        if (grandTotalEl) grandTotalEl.textContent = `₱ ${grandTotal}`;
+        if (placeOrderBtn) placeOrderBtn.textContent = `Place Order ₱ ${grandTotal}`;
+
+        const addMore = document.getElementById('reviewAddMore');
+        if (addMore && payload.restaurantKey) {
+            addMore.setAttribute('href', '#');
+        }
+    };
+
+    const hydrateReviewOrder = () => {
+        const params = new URLSearchParams(window.location.search);
+        let payload = null;
+        const cartParam = params.get('cart');
+
+        if (cartParam) {
+            try {
+                payload = JSON.parse(atob(decodeURIComponent(cartParam)));
+            } catch {
+                payload = null;
+            }
+        }
+
+        try {
+            if (!payload) {
+                const sessionPayload = sessionStorage.getItem('checkoutCart');
+                const localPayload = localStorage.getItem('checkoutCart');
+                payload = JSON.parse(sessionPayload || localPayload || 'null');
+            }
+        } catch {
+            payload = null;
+        }
+
+        currentReviewPayload = payload;
+        renderReviewPayload(payload);
+    };
+
+    const reviewAddItemModal = document.getElementById('reviewAddItemModal');
+    const reviewAddItemList = document.getElementById('reviewAddItemList');
+    const reviewAddQtyByName = {};
+
+    const getReviewAddQty = (name) => {
+        if (!reviewAddQtyByName[name]) reviewAddQtyByName[name] = 1;
+        return reviewAddQtyByName[name];
+    };
+
+    const renderReviewAddItemList = () => {
+        if (!reviewAddItemList || !currentReviewPayload?.menuItems?.length) return;
+        reviewAddItemList.innerHTML = currentReviewPayload.menuItems.map(item => {
+            const qty = getReviewAddQty(item.name);
+            return `
+                <div class="row" style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:8px; border:1px solid #eee; border-radius:10px;">
+                    <img src="${item.img}" alt="${item.name}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;">
+                    <div style="flex:1; min-width:0;">
+                        <strong style="display:block;">${item.name}</strong>
+                        <div class="text-muted text-sm">₱${item.price}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+                        <button type="button" data-review-qty-minus="${item.name}" style="width:26px;height:26px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer;">-</button>
+                        <span style="min-width:16px; text-align:center; font-weight:700;">${qty}</span>
+                        <button type="button" data-review-qty-plus="${item.name}" style="width:26px;height:26px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer;">+</button>
+                    </div>
+                    <button type="button" class="primary-btn" data-review-add-item="${item.name}" style="padding:8px 12px;font-size:14px; white-space:nowrap;">Add</button>
+                </div>
+            `;
+        }).join('');
+    };
+
+    const openReviewAddItemModal = () => {
+        if (!reviewAddItemModal || !reviewAddItemList || !currentReviewPayload?.menuItems?.length) return;
+        renderReviewAddItemList();
+        reviewAddItemModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeReviewAddItemModal = () => {
+        if (!reviewAddItemModal) return;
+        reviewAddItemModal.hidden = true;
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('reviewAddMore')?.addEventListener('click', e => {
+        e.preventDefault();
+        openReviewAddItemModal();
+    });
+
+    document.getElementById('reviewAddItemModalClose')?.addEventListener('click', closeReviewAddItemModal);
+    reviewAddItemModal?.addEventListener('click', e => {
+        if (e.target === reviewAddItemModal) closeReviewAddItemModal();
+    });
+
+    document.addEventListener('click', e => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+
+        const qtyPlusName = target.dataset.reviewQtyPlus;
+        if (qtyPlusName) {
+            reviewAddQtyByName[qtyPlusName] = getReviewAddQty(qtyPlusName) + 1;
+            renderReviewAddItemList();
+            return;
+        }
+
+        const qtyMinusName = target.dataset.reviewQtyMinus;
+        if (qtyMinusName) {
+            reviewAddQtyByName[qtyMinusName] = Math.max(1, getReviewAddQty(qtyMinusName) - 1);
+            renderReviewAddItemList();
+            return;
+        }
+
+        const name = target.dataset.reviewAddItem;
+        if (!name || !currentReviewPayload?.menuItems?.length) return;
+
+        const match = currentReviewPayload.menuItems.find(item => item.name === name);
+        if (!match) return;
+
+        const qtyToAdd = getReviewAddQty(name);
+        const itemTotal = Number(match.price) * qtyToAdd;
+        currentReviewPayload.items.push({
+            name: match.name,
+            price: itemTotal,
+            qty: qtyToAdd,
+            img: match.img,
+            addons: []
+        });
+        currentReviewPayload.total = currentReviewPayload.items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+        saveReviewPayload(currentReviewPayload);
+        renderReviewPayload(currentReviewPayload);
+        showToast(`${match.name} x${qtyToAdd} added to order.`);
+    });
+
+    hydrateReviewOrder();
+
+    // Keep latest review payload available after any page refresh.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'hidden') return;
+        const reviewBtn = document.getElementById('reviewBtn');
+        if (!reviewBtn) return;
+        try {
+            const sessionPayload = sessionStorage.getItem('checkoutCart');
+            if (sessionPayload) localStorage.setItem('checkoutCart', sessionPayload);
+        } catch (_error) {
+            // Ignore storage sync errors.
+        }
     });
 
     /* RESTAURANT MENU PAGE */
