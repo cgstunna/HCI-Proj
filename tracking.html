@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PandaBites</title>
     <link rel="icon" type="image/png" href="assets/logos/Bar logo.PNG">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-utilities.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -58,7 +59,9 @@
                     <div class="card-box shadow-sm">
                         <h3 class="mb-3">Rider's Information</h3>
                         <div class="rider-info-flex">
-                            <div class="rider-avatar" style="background-color: #ffcce0;"></div>
+                            <div class="rider-avatar">
+                                <img src="assets/icons/Driver icon.png" alt="Driver icon">
+                            </div>
                             <div class="details">
                                 <p><strong>Name:</strong> Kenji David</p>
                                 <p><strong>Vehicle:</strong> Honda Click v3 125</p>
@@ -74,12 +77,19 @@
                                 <span class="order-summary-toggle__chev" aria-hidden="true"></span>
                             </button>
                         </div>
-                        <div id="orderSummaryBody" class="summary-preview flex-start gap-4">
-                            <div class="food-thumb-small" style="width: 80px; height: 60px;" id="trackingThumb"></div>
-                            <div>
-                                <h4 class="m-0" id="trackingRestaurant">—</h4>
-                                <div class="text-sm m-0 mt-1" id="trackingItemsPreview">—</div>
-                                <p class="text-sm text-muted m-0 mt-1" id="trackingOrderId">Order #—</p>
+                        <div id="orderSummaryBody">
+                            <div class="summary-preview flex-start gap-4">
+                                <div class="food-thumb-small" style="width: 80px; height: 60px;" id="trackingThumb"></div>
+                                <div>
+                                    <h4 class="m-0" id="trackingRestaurant">—</h4>
+                                    <div class="text-sm m-0 mt-1" id="trackingItemsPreview">—</div>
+                                    <p class="text-sm text-muted m-0 mt-1" id="trackingOrderId">Order #—</p>
+                                </div>
+                            </div>
+
+                            <div id="trackingOrderDetails" class="mt-3">
+                                <div class="order-items" id="trackingOrderItems"></div>
+                                <div class="totals pt-3 mt-3" id="trackingTotals"></div>
                             </div>
                         </div>
                     </div>
@@ -108,6 +118,7 @@
             <div class="chat-badge">24/7 Chat Support</div>
         </a>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

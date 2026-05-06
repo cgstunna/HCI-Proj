@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* TRACKING PAGE */
 
-    const hydrateTrackingPage = () => {
+    const hydrateTrackingPage = async () => {
         const trackingMapEl = document.getElementById('trackingMap');
         if (!trackingMapEl) return;
 
@@ -883,6 +883,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const etaRangeEl = document.getElementById('trackingEtaRange');
         const etaSubEl = document.getElementById('trackingEtaSub');
         const thumbEl = document.getElementById('trackingThumb');
+        const orderItemsEl = document.getElementById('trackingOrderItems');
+        const totalsEl = document.getElementById('trackingTotals');
+        const summaryToggleEl = document.getElementById('orderSummaryToggle');
+        const summaryDetailsEl = document.getElementById('trackingOrderDetails');
 
         if (restaurantEl) restaurantEl.textContent = order.restaurantName || 'Restaurant';
         if (orderIdEl) orderIdEl.textContent = `Order #${(order.id || '').replace('ord_', '')}`;
@@ -891,6 +895,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (itemsPreviewEl) {
             const preview = items.slice(0, 2).map(i => `${i.qty}× ${i.name}`).join(' • ');
             itemsPreviewEl.textContent = preview || '—';
+        }
+
+        if (orderItemsEl) {
+            if (!items.length) {
+                orderItemsEl.textContent = 'No items.';
+            } else {
+                orderItemsEl.innerHTML = items.map((i, idx) => `
+                    <div class="item">
+                        <div class="item-qty">${Number(i.qty || 1)} ✕</div>
+                        <div class="item-desc">
+                            <strong>${String(i.name || 'Item')}</strong>
+                            ${i.img ? `<div class="food-thumb-small"><img src="${i.img}" alt="${String(i.name || 'Item')}"></div>` : ''}
+                        </div>
+                        <div class="item-price">₱ ${Number(i.price || 0)}</div>
+                    </div>
+                    ${idx === items.length - 1 ? '' : '<hr class="divider">'}
+                `).join('');
+            }
+        }
+
+        if (totalsEl) {
+            const subtotal = items.reduce((sum, i) => sum + Number(i.price || 0), 0);
+            const serviceFee = Number(order.serviceFee || 0);
+            const total = subtotal + serviceFee;
+            totalsEl.innerHTML = `
+                <div class="row"><span>Subtotal</span><span>₱ ${subtotal}</span></div>
+                <div class="row"><span>Service fee</span><span>₱ ${serviceFee}</span></div>
+                <div class="row" style="font-weight:800;"><span>Total</span><span>₱ ${total}</span></div>
+            `;
+        }
+
+        if (summaryToggleEl && summaryDetailsEl) {
+            // Default expanded.
+            const setExpanded = (expanded) => {
+                summaryToggleEl.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                summaryDetailsEl.hidden = !expanded;
+            };
+            setExpanded(summaryToggleEl.getAttribute('aria-expanded') !== 'false');
+            summaryToggleEl.addEventListener('click', () => {
+                const expanded = summaryToggleEl.getAttribute('aria-expanded') !== 'false';
+                setExpanded(!expanded);
+            });
         }
 
         if (thumbEl) {
@@ -924,22 +970,102 @@ document.addEventListener('DOMContentLoaded', () => {
         }).addTo(map);
 
         const destMarker = window.L.marker(destination).addTo(map);
-        const riderMarker = window.L.marker(riderStart).addTo(map);
-        const path = window.L.polyline([riderStart, destination], { color: '#d70f64', weight: 4, opacity: 0.9 }).addTo(map);
+
+        const riderGpsDivIcon = window.L.divIcon({
+            className: 'rider-gps-icon',
+            html: '<img src="assets/icons/drivergps.png" alt="Driver GPS">',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+        });
+        const riderMarker = window.L.marker(riderStart, { icon: riderGpsDivIcon }).addTo(map);
+
+        const setMarkerRotation = (deg) => {
+            const el = riderMarker.getElement();
+            if (!el) return;
+            const img = el.querySelector('img');
+            if (!img) return;
+            img.style.transform = `rotate(${deg}deg)`;
+        };
+
+        // Keep driver icon fixed (no rotation animation).
+        setMarkerRotation(0);
+
+        const fetchRoadRoute = async (start, end) => {
+            // OSRM public demo server. If blocked/offline, we fall back to straight line.
+            const startLngLat = `${start[1]},${start[0]}`;
+            const endLngLat = `${end[1]},${end[0]}`;
+            const url = `https://router.project-osrm.org/route/v1/driving/${startLngLat};${endLngLat}?overview=full&geometries=geojson`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Routing failed');
+            const data = await res.json();
+            const coords = data?.routes?.[0]?.geometry?.coordinates;
+            if (!Array.isArray(coords) || coords.length < 2) throw new Error('No route geometry');
+            // Convert [lng, lat] -> [lat, lng]
+            return coords.map(([lng, lat]) => [lat, lng]);
+        };
+
+        let routePoints = [];
+        try {
+            routePoints = await fetchRoadRoute(riderStart, destination);
+        } catch (_e) {
+            routePoints = [riderStart, destination];
+        }
+
+        const path = window.L.polyline(routePoints, { color: '#d70f64', weight: 4, opacity: 0.9 }).addTo(map);
         map.fitBounds(path.getBounds(), { padding: [20, 20] });
 
-        // Animate rider moving to destination
-        let t = 0;
-        const steps = 120;
-        const tickMs = 1000;
-        const interval = setInterval(() => {
-            t += 1;
-            const p = Math.min(1, t / steps);
-            const lat = riderStart[0] + (destination[0] - riderStart[0]) * p;
-            const lng = riderStart[1] + (destination[1] - riderStart[1]) * p;
-            riderMarker.setLatLng([lat, lng]);
-            if (p >= 1) clearInterval(interval);
-        }, tickMs);
+        // Animate rider along the route at a consistent speed (prevents "too fast" movement).
+        const speedMps = 6; // ~21.6 km/h (scooter-ish city speed). Adjust if you want slower/faster.
+        const metersPerDegLat = 111320;
+        const toRad = (deg) => (deg * Math.PI) / 180;
+        const metersPerDegLngAtLat = (lat) => 111320 * Math.cos(toRad(lat));
+        const distMeters = (a, b) => {
+            const avgLat = (a[0] + b[0]) / 2;
+            const dLatM = (b[0] - a[0]) * metersPerDegLat;
+            const dLngM = (b[1] - a[1]) * metersPerDegLngAtLat(avgLat);
+            return Math.hypot(dLatM, dLngM);
+        };
+        const lerp = (a, b, tVal) => a + (b - a) * tVal;
+
+        let segIdx = 0;
+        let segT = 0; // 0..1 along current segment
+        let lastTs = performance.now();
+
+        const step = (ts) => {
+            const dt = Math.min(0.25, Math.max(0, (ts - lastTs) / 1000)); // clamp to avoid jumps
+            lastTs = ts;
+
+            // Advance along segments using speed.
+            let remaining = speedMps * dt;
+            while (remaining > 0 && segIdx < routePoints.length - 1) {
+                const a = routePoints[segIdx];
+                const b = routePoints[segIdx + 1];
+                const segLen = Math.max(0.001, distMeters(a, b));
+                const leftOnSeg = (1 - segT) * segLen;
+
+                if (remaining >= leftOnSeg) {
+                    segIdx += 1;
+                    segT = 0;
+                    remaining -= leftOnSeg;
+                } else {
+                    segT += remaining / segLen;
+                    remaining = 0;
+                }
+            }
+
+            const a = routePoints[segIdx];
+            const b = routePoints[Math.min(segIdx + 1, routePoints.length - 1)];
+            const pos = [
+                lerp(a[0], b[0], segT),
+                lerp(a[1], b[1], segT)
+            ];
+            riderMarker.setLatLng(pos);
+
+            if (segIdx >= routePoints.length - 1) return; // done
+            requestAnimationFrame(step);
+        };
+
+        requestAnimationFrame(step);
     };
 
     hydrateTrackingPage();
