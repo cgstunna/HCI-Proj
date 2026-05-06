@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodpanda Redesign - Checkout</title>
+    <title>PandaBites</title>
+    <link rel="icon" type="image/png" href="assets/logos/Bar logo.PNG">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
     <div class="window-frame">
@@ -13,7 +16,6 @@
                 <div class="header-logo" onclick="window.location.href='/'">
                     <img src="assets/logos/pandabites.png" alt="Foodpanda logo"
                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23d70f64\'/%3E%3C/svg%3E'">
-                    <span>foodpanda</span>
                 </div>
                 <button type="button" id="checkoutHeaderLocation" class="location-pill center-pill checkout-location-btn" aria-label="Delivery area: Iriga City, Camarines Sur. Change location">
                     <span class="icon text-primary">📍</span>
@@ -21,8 +23,8 @@
                     <span class="header-menu-chev" aria-hidden="true"></span>
                 </button>
                 <div class="header-auth">
-                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Carl Gerald" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Carl Gerald <span class="header-menu-chev" aria-hidden="true"></span></div>
-                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> ENG</div>
+                    <div class="nav-item header-menu-trigger" data-header-menu="account" data-user-name="Account" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">👤</span> Account <span class="header-menu-chev" aria-hidden="true"></span></div>
+                    <div class="nav-item header-menu-trigger" data-header-menu="language" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🌐</span> EN</div>
                     <div class="nav-item cart-icon header-menu-trigger" data-header-menu="cart" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true"><span class="icon text-primary">🛒</span><span class="badge">1</span></div>
                 </div>
             </header>
@@ -44,7 +46,7 @@
                         <h3>Delivery Details</h3>
                         <div class="section-title">Delivery Address <a href="#" class="edit-text" id="deliveryAddressChange">Change</a></div>
                         <div class="address-card">
-                            <div class="map-thumb" style="background-color: #f0f0f0; width: 120px; height: 80px; border-radius: 8px;"></div>
+                            <div class="map-thumb" id="deliveryAddressMap" aria-label="Delivery map preview"></div>
                             <div class="address-info">
                                 <h4><span class="icon text-primary">📍</span> Camarines Sur Polytechnic Colleges</h4>
                                 <p class="text-muted">4434, National Rd, Nabua, Camarines Sur</p>
@@ -68,9 +70,9 @@
                         <h3>Personal Details</h3>
                         <div class="personal-card">
                             <div class="info">
-                                <h4 id="checkoutDisplayName">Carl Gerald Parro</h4>
-                                <p id="checkoutDisplayEmail" class="text-muted">carlgeraldparro@gmail.com</p>
-                                <p id="checkoutDisplayPhone" class="text-muted">09625728203</p>
+                                <h4 id="checkoutDisplayName">Account Name</h4>
+                                <p id="checkoutDisplayEmail" class="text-muted">email@example.com</p>
+                                <p id="checkoutDisplayPhone" class="text-muted">09XXXXXXXXX</p>
                             </div>
                             <a href="#" class="edit-link" id="personalDetailsOpen">Edit</a>
                         </div>
@@ -90,16 +92,20 @@
                 <div class="checkout-sidebar">
                     <div class="card-box order-summary">
                         <h3>Your Order</h3>
-                        <div class="restaurant-title">
-                            <div class="rest-logo-small"></div>
-                            <span><strong>Mang Inasal</strong> - Iriga City</span>
+                        <div class="restaurant-title" id="reviewRestaurantTitle">
+                            <div class="rest-logo-small">
+                                <img id="reviewRestaurantLogo" src="assets/manglogo.svg" alt="Restaurant logo">
+                            </div>
+                            <span id="reviewRestaurantName"><strong>Mang Inasal</strong> - Iriga City</span>
                         </div>
-                        <div class="order-items">
+                        <div class="order-items" id="reviewOrderItems">
                             <div class="item">
                                 <div class="item-qty">3 ✕</div>
                                 <div class="item-desc">
                                     <strong>Pecho Large - PM2</strong>
-                                    <div class="food-thumb-small"></div>
+                                    <div class="food-thumb-small">
+                                        <img src="assets/food/Pecho Large - PM2.png" alt="Pecho Large - PM2">
+                                    </div>
                                 </div>
                                 <div class="item-price">₱ 561</div>
                             </div>
@@ -108,19 +114,21 @@
                                 <div class="item-qty">1 ✕</div>
                                 <div class="item-desc">
                                     <strong>Paa Large - PM1</strong>
-                                    <div class="food-thumb-small"></div>
+                                    <div class="food-thumb-small">
+                                        <img src="assets/food/Paa Large - PM1.png" alt="Paa Large - PM1">
+                                    </div>
                                 </div>
                                 <div class="item-price">₱ 157</div>
                             </div>
                         </div>
-                        <a href="#" class="add-more">+ Add more items</a>
-                        <div class="totals pt-4 mt-4">
-                            <div class="row text-sm"><span class="text-muted">Subtotal</span><span class="text-muted">₱718</span></div>
+                        <a href="#" class="add-more" id="reviewAddMore">+ Add more items</a>
+                        <div class="totals pt-4 mt-4" id="reviewTotals">
+                            <div class="row text-sm"><span class="text-muted">Subtotal</span><span id="reviewSubtotal" class="text-muted">₱718</span></div>
                             <div class="row text-sm"><span class="text-muted">Standard delivery Free</span><span class="text-muted">Free</span></div>
-                            <div class="row text-sm"><span class="text-muted">Service Fee</span><span class="text-muted">₱5</span></div>
-                            <div class="row total-row mt-2"><strong>Total</strong> <small class="text-muted font-normal">(incl. fees and tax)</small> <strong>₱ 723</strong></div>
+                            <div class="row text-sm"><span class="text-muted">Service Fee</span><span id="reviewServiceFee" class="text-muted">₱5</span></div>
+                            <div class="row total-row mt-2"><strong>Total</strong> <small class="text-muted font-normal">(incl. fees and tax)</small> <strong id="reviewGrandTotal">₱ 723</strong></div>
                         </div>
-                        <button class="primary-btn checkout-btn full-width mt-4" onclick="window.location.href='/tracking'">Place Order ₱ 723</button>
+                        <button id="reviewPlaceOrderBtn" type="button" class="primary-btn checkout-btn full-width mt-4">Place Order ₱ 723</button>
                     </div>
                 </div>
             </div>
@@ -138,6 +146,87 @@
                 <label class="location-modal__label" for="pdPhone">Mobile number</label>
                 <input id="pdPhone" type="tel" class="note-input" style="width: 100%; margin-bottom: 20px;" autocomplete="tel">
                 <button type="button" class="primary-btn full-width" id="personalDetailsSave">Save changes</button>
+            </div>
+        </div>
+
+        <div id="locationModal" class="location-modal" hidden>
+            <div class="location-map-panel">
+                <button type="button" class="location-map-close" id="locationModalClose">x</button>
+
+                <h2>Set Your Delivery Location</h2>
+
+                <div class="location-map-input">
+                    <span>⌕</span>
+                    <input id="locationAddressInput" type="text" placeholder="Enter your delivery address">
+                </div>
+
+                <div class="location-map-selected">
+                    <span>📍</span>
+                    <p id="selectedLocationText">Click the map to pin your location</p>
+                </div>
+
+                <div id="liveMap" class="location-map-box"></div>
+
+                <div class="location-map-caption" id="locationCaption">
+                    No location selected yet
+                </div>
+
+                <button type="button" class="location-map-confirm" id="locationSubmitAddress">
+                    Confirm
+                </button>
+            </div>
+        </div>
+
+        <div id="reviewAddItemModal" class="location-modal" hidden>
+            <div class="location-modal__panel">
+                <button type="button" class="location-modal__close" id="reviewAddItemModalClose" aria-label="Close">&times;</button>
+                <h2 class="main-heading" style="font-size: 22px; margin-bottom: 8px;">Add more items</h2>
+                <p class="text-muted" style="margin-bottom: 14px;">Select an item to add to your current order.</p>
+                <div id="reviewAddItemList" class="cart-items-list"></div>
+            </div>
+        </div>
+
+        <div id="confirmPaymentModal" class="location-modal" role="dialog" aria-modal="true" aria-labelledby="confirmPaymentTitle" hidden>
+            <div class="location-modal__panel confirm-pay">
+                <button type="button" class="location-modal__close" id="confirmPaymentClose" aria-label="Close">&times;</button>
+                <h2 id="confirmPaymentTitle" class="main-heading" style="font-size: 22px; margin-bottom: 6px;">Confirm payment</h2>
+                <p class="text-muted" style="margin-bottom: 14px;">Review your order total and complete checkout.</p>
+
+                <div class="confirm-pay__summary">
+                    <div class="confirm-pay__meta">
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Order from</span>
+                            <span id="confirmPayRestaurant" class="text-muted">—</span>
+                        </div>
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Payment method</span>
+                            <span id="confirmPayMethod" class="text-muted">—</span>
+                        </div>
+                    </div>
+
+                    <div class="confirm-pay__items" id="confirmPayItems"></div>
+
+                    <div class="confirm-pay__totals">
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Subtotal</span>
+                            <span id="confirmPaySubtotal" class="text-muted">₱0</span>
+                        </div>
+                        <div class="confirm-pay__row">
+                            <span class="text-muted">Service fee</span>
+                            <span id="confirmPayFee" class="text-muted">₱0</span>
+                        </div>
+                        <div class="confirm-pay__divider"></div>
+                        <div class="confirm-pay__row confirm-pay__row--total">
+                            <strong>Total</strong>
+                            <strong id="confirmPayTotal">₱ 0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="confirm-pay__actions">
+                    <button type="button" id="confirmPaymentCancel" class="confirm-pay__btn confirm-pay__btn--ghost">Cancel</button>
+                    <button type="button" id="confirmPaymentConfirm" class="confirm-pay__btn confirm-pay__btn--primary">Confirm &amp; place order</button>
+                </div>
             </div>
         </div>
 
