@@ -48,16 +48,9 @@
                     <img class="menu-hero-food" src="" alt="Restaurant food">
                 </div>
 
-                <div class="menu-category-row">
+                <div class="menu-category-row" id="categoryRow">
                     <input id="menuSearch" type="text" placeholder="🔍 Search in menu">
-                    <button class="active" data-category="Popular">Popular</button>
-                    <button data-category="Meals">Meals</button>
-                    <button data-category="Chicken">Chicken</button>
-                    <button data-category="Burger">Burger</button>
-                    <button data-category="Drinks">Drinks</button>
-                    <button data-category="Dessert">Dessert</button>
                 </div>
-
                 <section class="menu-food-section">
                     <h2 id="sectionTitle">🔥 Popular</h2>
                     <p>Most ordered right now</p>
@@ -176,14 +169,32 @@ const restaurantData = {
         name: "Mang Inasal - Iriga City",
         category: "Desserts · Meat · BBQ · Chicken",
         logo: "assets/manglogo.svg",
+
         hero: "assets/food/pm2.webp",
         items: [
             { name: "Paa Large - PM1", price: 157, img: "images/paa-large.png", category: "Popular" },
             { name: "Pecho Large - PM2", price: 187, img: "images/pecho-large.png", category: "Chicken" },
             { name: "Pork BBQ Meal", price: 145, img: "images/paa-large.png", category: "Meals" },
             { name: "Halo-Halo", price: 89, img: "images/pecho-large.png", category: "Dessert" }
+    ],
+        hero: "assets/food/fiesta.png",
+        categories: ["Popular", "Chicken Inasal","Must Try!", "Fiesta Meals", "Palabok", "Pork BBQ", "Halo-Halo", "Inumin ATBP"],
+        items: [
+            { name: "Paa Large - PM1", price: 161, img: "assets/food/Pm1.webp", category: ["Popular", "Chicken Inasal"], desc: "Paa Large with 1 rice" },
+            { name: "Pecho Large - PM2", price: 191, img: "assets/food/pm2.png", category: ["Chicken Inasal", "Popular"], desc: "Pecho Large with 1 rice" },
+            { name: "Pork BBQ Meal", price: 145, img: "assets/food/Pork_bbq.webp", category: "Pork BBQ", desc: "Pork BBQ meal with rice" },
+            { name: "Halo-Halo", price: 89, img: "assets/food/halohalo.webp", category: "Halo-Halo", desc: "Classic halo-halo dessert" },
+            { name: "Liempo Inasal 1 Rice", price: 135, img: "assets/food/liempo.png", category: "Popular" , desc: "Paa Large with 1 rice" },
+            { name: "Pork Sisig 1 Rice", price: 105, img: "assets/food/sisig.png", category: ["Popular", "Meals"], desc: "Pecho Large with 1 rice" },
+            { name: "Chicken Inasal & Pork BBQ Family Fiestal", price: 910, img: "assets/food/fiesta.png", category: "Fiesta Meals", desc: "3 pcs Chicken Inasal Large, 6pcs Pork BBQ with Spiced Vinegar, Java Rice Platter, Good for 4-6" },
+            { name: "Palabok Regular Size", price: 101, img: "assets/food/palabok.webp", category: "Palabok", desc: "Good for 1" },
+            { name: "Sulit Sarap Combo Deal 1", price: 215, img: "assets/food/must1.png", category: "Must Try!", desc: "2 pc Pork BBQ with Spiced Vinegar with Drinks & Extra Creamy Halo Halo 8oz" },
+            { name: "Iced Red Gulaman", price: 46, img: "assets/food/inumin1.webp", category: "Inumin ATBP", desc: "Drinks" },
+            { name: "Chicken Inasal Regular", price: 118, img: "assets/food/reg.webp", category: ["Chicken Inasal", "Popular"], desc: "Chicken Inasal Regular with 1 rice, choice of chicken part is subject to availability"},
+            { name: "Chicken Inasal & Pork BBQ Buddy Size", price: 399, img: "assets/food/pop.png", category: ["Chicken Inasal", "Popular", "Pork BBQ"], desc: "2 pcs Chicken Inasal Paa Large and 2 pcs Pork BBQ"}
         ]
     },
+
     "jollibee": {
         name: "Jollibee - Iriga City",
         category: "Fast Food · Chicken · Burger · Spaghetti",
@@ -194,8 +205,22 @@ const restaurantData = {
             { name: "Jolly Spaghetti", price: 75, img: "images/spaghetti.png", category: "Meals" },
             { name: "Yumburger", price: 55, img: "images/chickenjoy.png", category: "Burger" },
             { name: "Peach Mango Pie", price: 48, img: "images/spaghetti.png", category: "Dessert" }
+    ],
+        logo: "assets/food/Jollibee logo.jpg",
+        hero: "assets/food/Jollibee side photo food.png",
+        categories: ["Popular", "Family Super Meals", "Chickenjoy", "Jolly Spaghetti", "Burger", "Fries", "Burger Steak","Dessert & Sweet Pies"],
+        items: [
+            { name: "1-pc. Chickenjoy w/ Drink", price: 111, img: "assets/food/c1.png", category: ["Popular","Chickenjoy"], desc: "Crispylicious, juicylicious Chickenjoy " },
+            { name: "Jolly Spaghetti", price: 78, img: "assets/food/Spag.png", category: "Jolly Spaghetti", desc: "Jolly Spaghetti Solo" },
+            { name: "Yumburger", price: 55, img: "assets/food/yum.png", category: "Burger", desc: "Yumburger meal" },
+            { name: "Peach Mango Pie", price: 53, img: "assets/food/peach.png", category: "Dessert & Sweet Pies", desc: "Golden brown, flaky, slightly sweet crust and mango filling in thick sauce" },
+            { name: "1 - pc. Chickenjoy w/ Jolly Spaghetti Solo", price: 168, img: "assets/food/jab1.png", category: ["Popular","Jolly Spaghetti"], desc: "Crispylicious, juicylicious Chickenjoy " },
+            { name: "1-pc. Chickenjoy, Half Jolly Spaghetti, Reg. Fries with Rice and Reg. Drink", price: 223, img: "assets/food/sm.png", category: ["Family Super Meals","Fries"], desc: "1-pc. Chickenjoy, Half Jolly Spaghetti, Reg. Fries with Rice and Reg. Drink" },
+            { name: "1 - pc. Burger Steak Solo", price: 82, img: "assets/food/br.png", category: "Burger Steak", desc: "100% pure beef YUM patty" },
+            { name: "Peach Mango Pie", price: 53, img: "assets/food/Peach Mango Pie.png", category: "Dessert", desc: "Golden brown, flaky, slightly sweet crust with a pleasant blend of diced peaches and mango filling in thick sauce" }
         ]
     },
+
     "mcdo": {
         name: "Mcdo - Iriga City",
         category: "Fast Food · Burgers · Fries · Drinks",
@@ -206,6 +231,15 @@ const restaurantData = {
             { name: "McChicken Meal", price: 155, img: "images/mcchicken.png", category: "Chicken" },
             { name: "Fries Large", price: 92, img: "images/burger-mcdo.png", category: "Meals" },
             { name: "Coke Float", price: 65, img: "images/mcchicken.png", category: "Drinks" }
+    ],
+        logo: "assets/food/McDonalds logo.jpg",
+        hero: "assets/food/McDonald side photo food.png",
+        categories: ["Popular", "Best Sellers", "#BetterWithCoke", "New Offers","Group Meals","Chicken","Chicken Fillet","Burgers", "Fries & Extras", "Desserts & Drinks"],
+        items: [
+            { name: "Burger McDo w/ Fries Small Meal", price: 126, img: "assets/food/mb.png", category:["Popular","Burger"], desc: "Comes with Small Fries & Drink" },
+            { name: "1-pc. Chicken McDo Solo", price: 96, img: "assets/food/mc.png", category: "Chicken", desc: "1-pc. Chicken McDo Solo" },
+            { name: "McSavers Sulit Busog Crispy Chicken Fillet Ala King with Extra Rice", price: 108, img: "assets/food/mc1.png", category: ["Popular", "Chicken Fillet"], desc: "Comes with extra rice" },
+            { name: "Crispy Chicken Fillet Ala King w/ Fries Small Meal", price: 142, img: "assets/food/mc2.png", category: ["Chicken Fillet", "Popular"], desc: "Comes with Small Fries and Drink" }
         ]
     }
 };
@@ -238,12 +272,40 @@ logo.src = restaurant.logo;
 logo.alt = restaurant.name;
 hero.src = restaurant.hero;
 hero.alt = restaurant.name;
+function renderCategories() {
+    categoryRow.querySelectorAll("button").forEach(button => button.remove());
+
+    restaurant.categories.forEach((category, index) => {
+        const button = document.createElement("button");
+
+        button.textContent = category;
+        button.dataset.category = category;
+
+        if (index === 0) {
+            button.classList.add("active");
+            currentCategory = category;
+        }
+
+        button.addEventListener("click", () => {
+            categoryRow.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+
+            currentCategory = category;
+            sectionTitle.textContent = currentCategory === "Popular" ? "🔥 Popular" : currentCategory;
+
+            renderMenu();
+        });
+
+        categoryRow.appendChild(button);
+    });
+}
 
 function renderMenu() {
     const keyword = searchInput.value.toLowerCase();
 
     const filteredItems = restaurant.items.filter(item => {
-        const matchesCategory = currentCategory === "Popular" || item.category === currentCategory;
+        const matchesCategory =
+    item.category.includes(currentCategory);
         const matchesSearch = item.name.toLowerCase().includes(keyword);
         return matchesCategory && matchesSearch;
     });
@@ -432,7 +494,7 @@ document.getElementById("reviewBtn").addEventListener("click", () => {
 
     window.location.href = "/review";
 });
-
+renderCategories();
 renderMenu();
 </script>
 
